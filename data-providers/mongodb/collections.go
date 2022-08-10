@@ -6,7 +6,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type User struct {
 	Id         primitive.ObjectID `bson:"_id"`        // User id
 	Name       string             `bson:"name"`       // User name
-	Credential Credential         `bson:"credential"` // User credential properties
+	Credential *Credential        `bson:"credential"` // User credential properties
 	Rating     int                `bson:"rating"`     // User rating
 }
 
@@ -16,7 +16,7 @@ type Course struct {
 	AuthorId   primitive.ObjectID  `bson:"author_id"`   // Course author id
 	Title      string              `bson:"title"`       // Course title
 	TitleImage string              `bson:"title_image"` // Course header image
-	PostBody   PostBody            `bson:"post_body"`   // Body of course
+	PostBody   *PostBody           `bson:"post_body"`   // Body of course
 	DateCreate primitive.Timestamp `bson:"date_create"` // Create date of course
 	DateUpdate primitive.Timestamp `bson:"date_update"` // Update date of course
 	Rating     int                 `bson:"rating"`      // Course rating
