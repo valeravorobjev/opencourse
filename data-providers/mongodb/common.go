@@ -22,6 +22,12 @@ type PostBody struct {
 	MediaItems []string `bson:"media_items"` // Various attachments
 }
 
+// SubCategory for category
+type SubCategory struct {
+	Number int    `bson:"number"` // Sub category number
+	Name   string `bson:"name"`   // Sub category name
+}
+
 // Action types
 const (
 	ActionLike    = "Like"    // Like

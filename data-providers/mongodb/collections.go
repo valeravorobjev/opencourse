@@ -10,6 +10,12 @@ type User struct {
 	Rating     int                `bson:"rating"`     // User rating
 }
 
+type Category struct {
+	Id            primitive.ObjectID `bson:"_id"`            // Category id
+	Name          string             `bson:"name"`           // Category name
+	SubCategories []*SubCategory     `bson:"sub_categories"` // Sub categories
+}
+
 // Stage collection
 type Stage struct {
 	Id         primitive.ObjectID  `bson:"_id"`         // Stage id
@@ -29,8 +35,8 @@ type Course struct {
 	Id          primitive.ObjectID   `bson:"_id"`          // Course id
 	Authors     []primitive.ObjectID `bson:"author_id"`    // Course author id
 	Name        string               `bson:"title"`        // Course title
-	Category    string               `bson:"category"`     // Course category
-	SubCategory string               `bson:"sub_category"` // Course sub category
+	Category    primitive.ObjectID   `bson:"category"`     // Course category
+	SubCategory int                  `bson:"sub_category"` // Course sub category
 	Tags        []string             `bson:"tags"`         // Course tags
 	BannerImg   string               `bson:"banner_img"`   // Course header image
 	DateCreate  primitive.Timestamp  `bson:"date_create"`  // Create date of course
