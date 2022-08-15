@@ -16,16 +16,16 @@ type Action struct {
 	ActionType string             `bson:"action_type"` // Action type
 }
 
-// PostBody contains data for any post
+// PostBody contains text and media data for stages
 type PostBody struct {
-	Body       string   `bson:"body"`        // Post body
-	MediaItems []string `bson:"media_items"` // Various attachments
+	Body       *GlobalStr `bson:"body"`        // Post body
+	MediaItems []string   `bson:"media_items"` // Various attachments
 }
 
 // SubCategory for category
 type SubCategory struct {
-	Number int    `bson:"number"` // Sub category number
-	Name   string `bson:"name"`   // Sub category name
+	Number int        `bson:"number"` // Sub category number
+	Name   *GlobalStr `bson:"name"`   // Sub category name
 }
 
 // Action types
@@ -40,6 +40,15 @@ const (
 	Author           = "Author"        // Is a author of courses
 	RoleAdmin        = "Administrator" // Privileged user role
 )
+
+// GlobalStr contains localization text for some languages. Check types array for get language type
+type GlobalStr struct {
+	Types []string `bson:"types"` // Types of text context. Contains elements with no empty str.
+	En    string   `bson:"en"`    // English text content
+	It    string   `bson:"it"`    // Italian text content
+	Fr    string   `bson:"fr"`    // France text content
+	Ru    string   `bson:"ru"`    // Russian text content
+}
 
 // Credential contains user auth data
 type Credential struct {
