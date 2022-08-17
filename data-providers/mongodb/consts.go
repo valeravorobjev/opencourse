@@ -8,4 +8,4 @@ const (
 	CourseCollection   = "courses"    // Collection store courses
 )
 
-const Db = "opencourse" // Database name
+const DbName = "opencourse" // Database name

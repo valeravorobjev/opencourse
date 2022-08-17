@@ -16,17 +16,27 @@ type Action struct {
 	ActionType string             `bson:"action_type"` // Action type
 }
 
-// PostBody contains text and media data for stages
-type PostBody struct {
-	Body       *GlobalStr `bson:"body"`        // Post body
-	MediaItems []string   `bson:"media_items"` // Various attachments
+// PostContent contains text and media data for stages
+type PostContent struct {
+	Lang       string   `bson:"lang"`        // LangType is a type of text language.
+	Text       string   `bson:"text"`        // Text specific for language type
+	MediaItems []string `bson:"media_items"` // Various attachments
 }
 
 // SubCategory for category
 type SubCategory struct {
 	Number int        `bson:"number"` // Sub category number
-	Name   *GlobalStr `bson:"name"`   // Sub category name
+	Names  []*GlobStr `bson:"names"`  // Sub category names
 }
+
+// Languages types
+const (
+	LangEn = "en" // English
+	LangFr = "fr" // France
+	LangDe = "de" // Germany
+	LangIt = "it" // Italian
+	LangRu = "ru" // Russian
+)
 
 // Action types
 const (
@@ -41,13 +51,10 @@ const (
 	RoleAdmin        = "Administrator" // Privileged user role
 )
 
-// GlobalStr contains localization text for some languages. Check types array for get language type
-type GlobalStr struct {
-	Types []string `bson:"types"` // Types of text context. Contains elements with no empty str.
-	En    string   `bson:"en"`    // English text content
-	It    string   `bson:"it"`    // Italian text content
-	Fr    string   `bson:"fr"`    // France text content
-	Ru    string   `bson:"ru"`    // Russian text content
+// GlobStr contains localization text for some language. Check lang for get language type
+type GlobStr struct {
+	Lang string `bson:"lang"` // LangType is a type of text language.
+	Text string `bson:"text"` // Text specific for language type
 }
 
 // Credential contains user auth data

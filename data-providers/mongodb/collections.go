@@ -10,9 +10,10 @@ type User struct {
 	Rating     int                `bson:"rating"`     // User rating
 }
 
+// Category course
 type Category struct {
-	Id            primitive.ObjectID `bson:"_id"`            // Category id
-	Name          *GlobalStr         `bson:"name"`           // Category name
+	Id            primitive.ObjectID `bson:"_id,omitempty"`  // Category id
+	Names         []*GlobStr         `bson:"names"`          // Category names
 	SubCategories []*SubCategory     `bson:"sub_categories"` // Sub categories
 }
 
@@ -21,9 +22,9 @@ type Stage struct {
 	Id         primitive.ObjectID  `bson:"_id"`         // Stage id
 	AuthorId   primitive.ObjectID  `bson:"author_id"`   // Author id how right stage
 	CourseId   primitive.ObjectID  `bson:"course_id"`   // Course id. One course has many stages
-	Name       *GlobalStr          `bson:"name"`        // Course stage name
+	Names      []*GlobStr          `bson:"names"`       // Course stage names
 	BannerImg  string              `bson:"banner_img"`  // Stage header image
-	PostBody   *PostBody           `bson:"post_body"`   // Body of stage
+	Contents   []*PostContent      `bson:"contents"`    // Stage contents
 	DateCreate primitive.Timestamp `bson:"date_create"` // Create date of course
 	DateUpdate primitive.Timestamp `bson:"date_update"` // Update date of course
 	Actions    []*Action           `bson:"actions"`     // Actions for comments
@@ -34,10 +35,10 @@ type Stage struct {
 type Course struct {
 	Id          primitive.ObjectID   `bson:"_id"`          // Course id
 	Authors     []primitive.ObjectID `bson:"author_id"`    // Course author id
-	Name        *GlobalStr           `bson:"title"`        // Course title
+	Names       []*GlobStr           `bson:"names"`        // Course names
 	Category    primitive.ObjectID   `bson:"category"`     // Course category
 	SubCategory int                  `bson:"sub_category"` // Course sub category
-	Tags        []*GlobalStr         `bson:"tags"`         // Course tags
+	Tags        [][]*GlobStr         `bson:"tags"`         // Course tags
 	BannerImg   string               `bson:"banner_img"`   // Course header image
 	DateCreate  primitive.Timestamp  `bson:"date_create"`  // Create date of course
 	DateUpdate  primitive.Timestamp  `bson:"date_update"`  // Update date of course

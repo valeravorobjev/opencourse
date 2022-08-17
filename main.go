@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"opencourse/data-providers/mongodb"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -10,8 +11,49 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("Hello World!"))
+	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+
+		db := &mongodb.ContextMongoDb{}
+
+		err := db.Connect("mongodb://localhost")
+		if err != nil {
+			panic(err)
+		}
+
+		defer func() {
+			err = db.Disconnect()
+			if err != nil {
+				panic(err)
+			}
+		}()
+
+		category := mongodb.Category{
+			Names: []*mongodb.GlobStr{
+				{
+					Lang: mongodb.LangRu,
+					Text: "Программирование",
+				},
+			},
+			SubCategories: []*mongodb.SubCategory{
+				{
+					Number: 1,
+					Names: []*mongodb.GlobStr{
+						{
+							Lang: mongodb.LangRu,
+							Text: "Язык C# и платформа .NET",
+						},
+					},
+				},
+			},
+		}
+
+		id, err := db.AddCategory(&category)
+
+		if err != nil {
+			panic(err)
+		}
+
+		_, _ = w.Write([]byte(id))
 	})
 	_ = http.ListenAndServe(":3000", r)
 }
