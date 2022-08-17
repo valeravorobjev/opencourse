@@ -27,33 +27,39 @@ func main() {
 			}
 		}()
 
-		category := mongodb.Category{
-			Names: []*mongodb.GlobStr{
-				{
-					Lang: mongodb.LangRu,
-					Text: "Программирование",
-				},
-			},
-			SubCategories: []*mongodb.SubCategory{
-				{
-					Number: 1,
-					Names: []*mongodb.GlobStr{
-						{
-							Lang: mongodb.LangRu,
-							Text: "Язык C# и платформа .NET",
-						},
-					},
-				},
-			},
-		}
+		//category := mongodb.Category{
+		//	Names: []*mongodb.GlobStr{
+		//		{
+		//			Lang: mongodb.LangRu,
+		//			Text: "Программирование",
+		//		},
+		//	},
+		//	SubCategories: []*mongodb.SubCategory{
+		//		{
+		//			Number: 1,
+		//			Names: []*mongodb.GlobStr{
+		//				{
+		//					Lang: mongodb.LangRu,
+		//					Text: "Язык C# и платформа .NET",
+		//				},
+		//			},
+		//		},
+		//	},
+		//}
+		//
+		//id, err := db.AddCategory(&category)
+		//
+		//if err != nil {
+		//	panic(err)
+		//}
 
-		id, err := db.AddCategory(&category)
+		err = db.DeleteSubCategory("62fca089be2a1ee3caae2e82", 2)
 
 		if err != nil {
 			panic(err)
 		}
 
-		_, _ = w.Write([]byte(id))
+		_, _ = w.Write([]byte("62fca089be2a1ee3caae2e82"))
 	})
 	_ = http.ListenAndServe(":3000", r)
 }
