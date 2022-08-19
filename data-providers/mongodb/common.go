@@ -46,9 +46,9 @@ const (
 
 // User roles
 const (
-	RoleUser  string = "User"          // Simple user role
-	Author           = "Author"        // Is a author of courses
-	RoleAdmin        = "Administrator" // Privileged user role
+	RoleUser   string = "User"          // Simple user role
+	RoleAuthor        = "Author"        // Is a author of courses
+	RoleAdmin         = "Administrator" // Privileged user role
 )
 
 // GlobStr contains localization text for some language. Check lang for get language type

@@ -6,8 +6,10 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type User struct {
 	Id         primitive.ObjectID `bson:"_id"`        // User id
 	Name       string             `bson:"name"`       // User name
+	Avatar     string             `bson:"avatar"`     // Avatar image path
 	Credential *Credential        `bson:"credential"` // User credential properties
 	Rating     int                `bson:"rating"`     // User rating
+	Email      string             `bson:"email"`      // User email address
 }
 
 // Category course
