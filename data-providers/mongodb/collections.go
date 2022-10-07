@@ -12,7 +12,7 @@ type User struct {
 	Email      string             `bson:"email"`      // User email address
 }
 
-// Category course
+// Category of curses collection
 type Category struct {
 	Id            primitive.ObjectID `bson:"_id,omitempty"`  // Category id
 	Names         []*GlobStr         `bson:"names"`          // Category names

@@ -29,28 +29,6 @@ type SubCategory struct {
 	Names  []*GlobStr `bson:"names"`  // Sub category names
 }
 
-// Languages types
-const (
-	LangEn = "en" // English
-	LangFr = "fr" // France
-	LangDe = "de" // Germany
-	LangIt = "it" // Italian
-	LangRu = "ru" // Russian
-)
-
-// Action types
-const (
-	ActionLike    = "Like"    // Like
-	ActionDislike = "Dislike" // Dislike
-)
-
-// User roles
-const (
-	RoleUser   string = "User"          // Simple user role
-	RoleAuthor        = "Author"        // Is a author of courses
-	RoleAdmin         = "Administrator" // Privileged user role
-)
-
 // GlobStr contains localization text for some language. Check lang for get language type
 type GlobStr struct {
 	Lang string `bson:"lang"` // LangType is a type of text language.

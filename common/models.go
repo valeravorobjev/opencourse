@@ -1,5 +1,7 @@
 package common
 
+// Open - project prefix
+
 // OpenUser user common model
 type OpenUser struct {
 	Id     string   `json:"id"`     // User id

@@ -15,6 +15,9 @@ func main() {
 
 		db := &mongodb.ContextMongoDb{}
 
+		// Init default values
+		db.Defaults()
+
 		err := db.Connect("mongodb://localhost")
 		if err != nil {
 			panic(err)

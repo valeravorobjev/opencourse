@@ -2,9 +2,11 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"opencourse/common/openerrors"
 )
 
 // GetCategories return all categories from db
@@ -14,7 +16,15 @@ func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
 	cursor, err := col.Find(context.Background(), bson.D{})
 
 	if err != nil {
-		return nil, err
+		return nil, openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "GetCategories",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	var categories []*Category
@@ -34,7 +44,15 @@ func (ctx *ContextMongoDb) AddCategory(category *Category) (string, error) {
 	result, err := col.InsertOne(context.Background(), category)
 
 	if err != nil {
-		return "", err
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "AddCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	id := result.InsertedID.(primitive.ObjectID)
@@ -42,7 +60,8 @@ func (ctx *ContextMongoDb) AddCategory(category *Category) (string, error) {
 	return id.Hex(), err
 }
 
-/*UpdateCategory update category name
+/*
+UpdateCategory update category name
 @cid - category id
 @names - category names
 */
@@ -62,13 +81,22 @@ func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*GlobStr) error {
 	_, err := col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "UpdateCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	return nil
 }
 
-/*UpdateSubCategory updage sub category names
+/*
+UpdateSubCategory updage sub category names
 @cid - category id
 @scn - sub category number
 @names - sub category names
@@ -92,13 +120,22 @@ func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, names []*GlobS
 	_, err := col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "UpdateSubCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	return nil
 }
 
-/*AddSubCategory add sub category for category.
+/*
+AddSubCategory add sub category for category.
 @cid   - category id
 @name - sub category name
 @lang - sub category language
@@ -109,7 +146,17 @@ func (ctx *ContextMongoDb) AddSubCategory(cid string, name string, lang string) 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
 
 	if err != nil {
-		return err
+		return openerrors.OpenInvalidIdErr{
+			Default: openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/category_impl.go",
+					Method: "AddSubCategory",
+				},
+				Msg: fmt.Sprintf("can't convert cid %s to ObjectID with method primitive.ObjectIDFromHex(cid)", cid),
+			},
+			Id:        cid,
+			Converter: " primitive.ObjectIDFromHex(cid)",
+		}
 	}
 
 	filter := bson.D{
@@ -120,7 +167,15 @@ func (ctx *ContextMongoDb) AddSubCategory(cid string, name string, lang string) 
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "AddSubCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	var subCategory *SubCategory
@@ -153,14 +208,23 @@ func (ctx *ContextMongoDb) AddSubCategory(cid string, name string, lang string) 
 	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "AddSubCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	return nil
 
 }
 
-/*DeleteSubCategory delete sub category from category
+/*
+DeleteSubCategory delete sub category from category
 @cid - category id
 @scn - sub category number
 */
@@ -170,7 +234,17 @@ func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
 	categoryId, err := primitive.ObjectIDFromHex(cid)
 
 	if err != nil {
-		return err
+		return openerrors.OpenInvalidIdErr{
+			Default: openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/category_impl.go",
+					Method: "DeleteSubCategory",
+				},
+				Msg: fmt.Sprintf("can't convert cid %s to ObjectID with method primitive.ObjectIDFromHex(cid)", cid),
+			},
+			Id:        cid,
+			Converter: "primitive.ObjectIDFromHex(cid)",
+		}
 	}
 
 	filter := bson.D{
@@ -181,7 +255,15 @@ func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "DeleteSubCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	if len(category.SubCategories) == 0 {
@@ -208,7 +290,15 @@ func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
 	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "DeleteSubCategory",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	return nil

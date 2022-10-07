@@ -2,20 +2,37 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"opencourse/common/openerrors"
 )
 
 // ContextMongoDb is a context for work with mongo db
 type ContextMongoDb struct {
+	Uri    string        // Connection string
+	DbName string        // Db name. Example: mongodb/opencourse
 	client *mongo.Client // Client connection for db
+}
+
+// Defaults init values
+func (ctx *ContextMongoDb) Defaults() {
+	ctx.DbName = fmt.Sprintf("mongodb/%s", DbName)
 }
 
 // Connect to db
 func (ctx *ContextMongoDb) Connect(uri string) error {
+	ctx.Uri = uri
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/dbcontext.go",
+				Method: "Connect",
+			},
+			DbName: ctx.DbName,
+			ConStr: uri,
+		}
 	}
 	ctx.client = client
 	return nil
@@ -25,7 +42,14 @@ func (ctx *ContextMongoDb) Connect(uri string) error {
 func (ctx *ContextMongoDb) Disconnect() error {
 	err := ctx.client.Disconnect(context.Background())
 	if err != nil {
-		return err
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/dbcontext.go",
+				Method: "Disconnect",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+		}
 	}
 
 	return nil
