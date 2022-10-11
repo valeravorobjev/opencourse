@@ -12,7 +12,7 @@ import (
 type ContextMongoDb struct {
 	Uri    string        // Connection string
 	DbName string        // Db name. Example: mongodb/opencourse
-	client *mongo.Client // Client connection for db
+	Client *mongo.Client // Client connection for db
 }
 
 // Defaults init values
@@ -34,13 +34,13 @@ func (ctx *ContextMongoDb) Connect(uri string) error {
 			ConStr: uri,
 		}
 	}
-	ctx.client = client
+	ctx.Client = client
 	return nil
 }
 
 // Disconnect db
 func (ctx *ContextMongoDb) Disconnect() error {
-	err := ctx.client.Disconnect(context.Background())
+	err := ctx.Client.Disconnect(context.Background())
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{

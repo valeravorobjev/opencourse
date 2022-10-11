@@ -11,7 +11,7 @@ import (
 
 // GetCategories return all categories from db
 func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	cursor, err := col.Find(context.Background(), bson.D{})
 
@@ -47,7 +47,7 @@ func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
 
 // AddCategory method for add new category and sub categories to database
 func (ctx *ContextMongoDb) AddCategory(category *Category) (string, error) {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	result, err := col.InsertOne(context.Background(), category)
 
@@ -74,7 +74,7 @@ UpdateCategory update category name
 @names - category names
 */
 func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*GlobStr) error {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
 		{"_id", cid},
@@ -110,7 +110,7 @@ UpdateSubCategory updage sub category names
 @names - sub category names
 */
 func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, names []*GlobStr) error {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
 		{"$and", bson.A{
@@ -149,7 +149,7 @@ AddSubCategory add sub category for category.
 @lang - sub category language
 */
 func (ctx *ContextMongoDb) AddSubCategory(cid string, name string, lang string) error {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
 
@@ -237,7 +237,7 @@ DeleteSubCategory delete sub category from category
 @scn - sub category number
 */
 func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
-	col := ctx.client.Database(DbName).Collection(CategoryCollection)
+	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
 

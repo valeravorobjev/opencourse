@@ -36,7 +36,7 @@ type Stage struct {
 // Course collection
 type Course struct {
 	Id          primitive.ObjectID   `bson:"_id"`          // Course id
-	Authors     []primitive.ObjectID `bson:"author_id"`    // Course author id
+	Authors     []primitive.ObjectID `bson:"author_ids"`   // Course author ids
 	Names       []*GlobStr           `bson:"names"`        // Course names
 	Category    primitive.ObjectID   `bson:"category"`     // Course category
 	SubCategory int                  `bson:"sub_category"` // Course sub category
