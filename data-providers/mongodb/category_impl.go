@@ -31,7 +31,15 @@ func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
 
 	err = cursor.Decode(categories)
 	if err != nil {
-		return nil, err
+		return nil, openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "GetCategories",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
 	return categories, nil
