@@ -18,8 +18,7 @@ type Action struct {
 
 // PostContent contains text and media data for stages
 type PostContent struct {
-	Lang       string   `bson:"lang"`        // LangType is a type of text language.
-	Text       string   `bson:"text"`        // Text specific for language type
+	Body       *GlobStr `bson:"body"`        // Post's body
 	MediaItems []string `bson:"media_items"` // Various attachments
 }
 

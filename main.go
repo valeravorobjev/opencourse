@@ -9,6 +9,9 @@ import (
 )
 
 func main() {
+
+	// TODO:: This is only development box!
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
