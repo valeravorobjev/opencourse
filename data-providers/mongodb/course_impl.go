@@ -144,7 +144,7 @@ func (ctx *ContextMongoDb) AddCourseAuthors(id string, aids []string) error {
 }
 
 /*
-RemoveCourseAuthors add authors to course
+RemoveCourseAuthors delete authors from course
 @id - course id
 @aids - authors ids
 */
@@ -163,7 +163,7 @@ func (ctx *ContextMongoDb) RemoveCourseAuthors(id string, aids []string) error {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/course_impl.go",
-				Method: "AddCourseAuthors",
+				Method: "RemoveCourseAuthors",
 			},
 			DbName: ctx.DbName,
 			ConStr: ctx.Uri,
@@ -172,4 +172,192 @@ func (ctx *ContextMongoDb) RemoveCourseAuthors(id string, aids []string) error {
 	}
 
 	return nil
+}
+
+/*
+SetCourseAction set action for course
+@id - course id
+@action - user action
+*/
+func (ctx *ContextMongoDb) SetCourseAction(id string, action *Action) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	filter := bson.D{{"_id", id}, {"actions.user_id", action.UserId}}
+
+	//TODO:: check work or not
+	update := bson.D{
+		{"$addToSet", bson.E{Key: "actions", Value: action}},
+	}
+
+	_, err := col.UpdateOne(context.Background(), filter, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "SetCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
+/*
+UnsetCourseAction remove action from course
+@id - course id
+@userId - user id
+*/
+func (ctx *ContextMongoDb) UnsetCourseAction(id string, userId string) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	filter := bson.D{{"_id", id}}
+
+	//TODO:: check work or not
+	update := bson.D{
+		{"$pull",
+			bson.D{
+				{"actions", bson.E{Key: "user_id", Value: userId}},
+			},
+		},
+	}
+
+	_, err := col.UpdateOne(context.Background(), filter, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "UnsetCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
+/*
+AddCourseComment add comment to course or for another course comment
+@id - course id
+@userId - user id
+@text - comment's text
+*/
+func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text string) (string, error) {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
+
+	find := bson.D{
+		{"_id", id},
+	}
+
+	update := bson.D{
+		{"$push", bson.D{{"comments", comment}}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), find, update)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return comment.Id.Hex(), nil
+}
+
+/*
+RemoveCourseComment remove comment from course
+@id - course id
+@commentId - comment id
+*/
+func (ctx *ContextMongoDb) RemoveCourseComment(id string, commentId string) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	find := bson.D{
+		{"_id", id}, {"comments.id", commentId},
+	}
+
+	update := bson.D{
+		{"$pop", bson.D{{"comments", 1}}},
+	}
+
+	_, err := col.UpdateOne(context.Background(), find, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "RemoveCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (ctx *ContextMongoDb) ReplayCourseComment(id string, commentId string, userId string, text string) (string, error) {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ReplayCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
+
+	find := bson.D{
+		{"_id", id}, {"comments.id", commentId},
+	}
+
+	update := bson.D{
+		{"$push", bson.D{{"comments", comment}}},
+	}
+
+}
+
+func (ctx *ContextMongoDb) SetCourseCommentAction(id string, commentId string, action *Action) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+}
+
+func (ctx *ContextMongoDb) UnsetCourseCommentAction(id string, commentId string, userId string) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 }

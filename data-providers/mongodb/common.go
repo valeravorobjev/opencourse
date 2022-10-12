@@ -4,6 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Comment for post, course, etc..
 type Comment struct {
+	Id       primitive.ObjectID `bson:"id"`       // Comment id
 	UserId   primitive.ObjectID `bson:"user_id"`  // User id
 	Text     string             `bson:"text"`     // Comment text
 	Actions  []*Action          `bson:"actions"`  // Actions for comment

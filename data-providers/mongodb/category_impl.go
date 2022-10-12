@@ -104,7 +104,7 @@ func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*GlobStr) error {
 }
 
 /*
-UpdateSubCategory updage sub category names
+UpdateSubCategory update sub category names
 @cid - category id
 @scn - sub category number
 @names - sub category names
