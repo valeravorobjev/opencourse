@@ -1,4 +1,4 @@
-package integration
+package mongodb
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -130,5 +130,37 @@ func TestGetCourses(t *testing.T) {
 
 	if len(courses) < 10 {
 		t.Error(err)
+	}
+}
+
+// TestAddCourseAuthors
+func TestAddCourseAuthors(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	authorIds := []string{primitive.NewObjectID().Hex(), primitive.NewObjectID().Hex()}
+
+	err = context.AddCourseAuthors(id, authorIds)
+
+	if err != nil {
+		t.Fatal(err)
 	}
 }

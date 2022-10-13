@@ -133,13 +133,46 @@ AddCourseAuthors add authors to course
 func (ctx *ContextMongoDb) AddCourseAuthors(id string, aids []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	filter := bson.D{{"_id", id}}
+	objectId, err := primitive.ObjectIDFromHex(id)
 
-	update := bson.D{
-		{"$push", bson.E{Key: "author_ids", Value: aids}},
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseAuthors",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	var objectAids []primitive.ObjectID
+	for _, aid := range aids {
+		objectAid, err := primitive.ObjectIDFromHex(aid)
+
+		if err != nil {
+			return openerrors.OpenDbErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/course_impl.go",
+					Method: "AddCourseAuthors",
+				},
+				DbName: ctx.DbName,
+				ConStr: ctx.Uri,
+				DbErr:  err.Error(),
+			}
+		}
+
+		objectAids = append(objectAids, objectAid)
+	}
+
+	filter := bson.D{{"_id", objectId}}
+
+	update := bson.D{
+		{"$push", bson.D{{"author_ids", bson.D{{"$each", objectAids}}}}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{
