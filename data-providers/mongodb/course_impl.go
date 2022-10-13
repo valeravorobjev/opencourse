@@ -373,6 +373,50 @@ func (ctx *ContextMongoDb) RemoveCourseAction(id string, userId string) error {
 }
 
 /*
+ChangeCourseAction change course action
+@id - course id
+action - user action
+*/
+func (ctx *ContextMongoDb) ChangeCourseAction(id string, action *Action) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ChangeCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	filter := bson.D{{"_id", objectId}, {"actions.user_id", action.UserId}}
+
+	update := bson.D{{"$set", bson.D{{"actions.$.action_type", action.ActionType}}}}
+
+	_, err = col.UpdateOne(context.Background(), filter, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ChangeCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+
+}
+
+/*
 AddCourseComment add comment to course or for another course comment
 @id - course id
 @userId - user id

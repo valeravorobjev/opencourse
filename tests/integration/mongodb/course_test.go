@@ -350,3 +350,50 @@ func TestRemoveCourseAction(t *testing.T) {
 		t.Error("Course must be empty")
 	}
 }
+
+// TestChangeCourseAction
+func TestChangeCourseAction(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userId := primitive.NewObjectID()
+	err = context.AddCourseAction(id, &mongodb.Action{UserId: userId, ActionType: mongodb.ActionLike})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.ChangeCourseAction(id, &mongodb.Action{UserId: userId, ActionType: mongodb.ActionDislike})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	courseResult, err := context.GetCourse(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(courseResult.Actions) != 1 || courseResult.Actions[0].ActionType != mongodb.ActionDislike {
+		t.Error("Course must = 1 and ActionType = ActionDislike")
+	}
+}
