@@ -17,7 +17,7 @@ AddUser create user and save his to database
 @createUserQuery - create user model
 */
 func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenCreateUserQuery) (string, error) {
-	col := ctx.client.Database(DbName).Collection(UserCollection)
+	col := ctx.Client.Database(DbName).Collection(UserCollection)
 
 	// Validate create user model
 

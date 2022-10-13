@@ -4,12 +4,12 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // User collection
 type User struct {
-	Id         primitive.ObjectID `bson:"_id"`        // User id
-	Name       string             `bson:"name"`       // User name
-	Avatar     string             `bson:"avatar"`     // Avatar image path
-	Credential *Credential        `bson:"credential"` // User credential properties
-	Rating     int                `bson:"rating"`     // User rating
-	Email      string             `bson:"email"`      // User email address
+	Id         primitive.ObjectID `bson:"_id,omitempty"` // User id
+	Name       string             `bson:"name"`          // User name
+	Avatar     string             `bson:"avatar"`        // Avatar image path
+	Credential *Credential        `bson:"credential"`    // User credential properties
+	Rating     int                `bson:"rating"`        // User rating
+	Email      string             `bson:"email"`         // User email address
 }
 
 // Category of curses collection
@@ -21,30 +21,30 @@ type Category struct {
 
 // Stage collection
 type Stage struct {
-	Id         primitive.ObjectID  `bson:"_id"`         // Stage id
-	AuthorId   primitive.ObjectID  `bson:"author_id"`   // Author id how right stage
-	CourseId   primitive.ObjectID  `bson:"course_id"`   // Course id. One course has many stages
-	Names      []*GlobStr          `bson:"names"`       // Course stage names
-	BannerImg  string              `bson:"banner_img"`  // Stage header image
-	Contents   []*PostContent      `bson:"contents"`    // Stage contents
-	DateCreate primitive.Timestamp `bson:"date_create"` // Create date of course
-	DateUpdate primitive.Timestamp `bson:"date_update"` // Update date of course
-	Actions    []*Action           `bson:"actions"`     // Actions for comments
-	Comments   []*Comment          `bson:"comments"`    // Comments for this post
+	Id         primitive.ObjectID  `bson:"_id,omitempty"` // Stage id
+	AuthorId   primitive.ObjectID  `bson:"author_id"`     // Author id how right stage
+	CourseId   primitive.ObjectID  `bson:"course_id"`     // Course id. One course has many stages
+	Names      []*GlobStr          `bson:"names"`         // Course stage names
+	BannerImg  string              `bson:"banner_img"`    // Stage header image
+	Contents   []*PostContent      `bson:"contents"`      // Stage contents
+	DateCreate primitive.Timestamp `bson:"date_create"`   // Create date of course
+	DateUpdate primitive.Timestamp `bson:"date_update"`   // Update date of course
+	Actions    []*Action           `bson:"actions"`       // Actions for comments
+	Comments   []*Comment          `bson:"comments"`      // Comments for this post
 }
 
 // Course collection
 type Course struct {
-	Id          primitive.ObjectID   `bson:"_id"`          // Course id
-	Authors     []primitive.ObjectID `bson:"author_ids"`   // Course author ids
-	Names       []*GlobStr           `bson:"names"`        // Course names
-	Category    primitive.ObjectID   `bson:"category"`     // Course category
-	SubCategory int                  `bson:"sub_category"` // Course sub category
-	Tags        [][]*GlobStr         `bson:"tags"`         // Course tags
-	BannerImg   string               `bson:"banner_img"`   // Course header image
-	DateCreate  primitive.Timestamp  `bson:"date_create"`  // Create date of course
-	DateUpdate  primitive.Timestamp  `bson:"date_update"`  // Update date of course
-	Rating      int                  `bson:"rating"`       // Course rating
-	Actions     []*Action            `bson:"actions"`      // Actions for comments
-	Comments    []*Comment           `bson:"comments"`     // Comments for this post
+	Id          primitive.ObjectID   `bson:"_id,omitempty"` // Course id
+	Authors     []primitive.ObjectID `bson:"author_ids"`    // Course author ids
+	Names       []*GlobStr           `bson:"names"`         // Course names
+	Category    primitive.ObjectID   `bson:"category"`      // Course category
+	SubCategory int                  `bson:"sub_category"`  // Course sub category
+	Tags        []*GlobStr           `bson:"tags"`          // Course tags
+	BannerImg   string               `bson:"banner_img"`    // Course header image
+	DateCreate  primitive.Timestamp  `bson:"date_create"`   // Create date of course
+	DateUpdate  primitive.Timestamp  `bson:"date_update"`   // Update date of course
+	Rating      int                  `bson:"rating"`        // Course rating
+	Actions     []*Action            `bson:"actions"`       // Actions for comments
+	Comments    []*Comment           `bson:"comments"`      // Comments for this post
 }
