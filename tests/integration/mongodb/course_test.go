@@ -206,3 +206,60 @@ func TestRemoveCourseAuthors(t *testing.T) {
 		t.Error("Authors field must be empty")
 	}
 }
+
+// TestAddCourseAction
+func TestAddCourseAction(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userId := primitive.NewObjectID()
+	action := mongodb.Action{ActionType: mongodb.ActionLike, UserId: userId}
+
+	err = context.AddCourseAction(id, &action)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.AddCourseAction(id, &action)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	action.ActionType = mongodb.ActionDislike
+	err = context.AddCourseAction(id, &action)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	courseResult, err := context.GetCourse(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(courseResult.Actions) != 1 {
+		t.Error("Course contains more than one action")
+	}
+
+}

@@ -255,21 +255,35 @@ func (ctx *ContextMongoDb) RemoveCourseAuthors(id string, aids []string) error {
 }
 
 /*
-SetCourseAction set action for course
+AddCourseAction set action for course
 @id - course id
 @action - user action
 */
-func (ctx *ContextMongoDb) SetCourseAction(id string, action *Action) error {
+func (ctx *ContextMongoDb) AddCourseAction(id string, action *Action) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	filter := bson.D{{"_id", id}, {"actions.user_id", action.UserId}}
+	objectId, err := primitive.ObjectIDFromHex(id)
 
-	//TODO:: check work or not
-	update := bson.D{
-		{"$addToSet", bson.E{Key: "actions", Value: action}},
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "SetCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	filter := bson.D{{"_id", objectId},
+		{"actions.user_id", bson.D{{"$ne", action.UserId}}}}
+
+	update := bson.D{
+		{"$push", bson.D{{"actions", action}}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{
@@ -287,11 +301,11 @@ func (ctx *ContextMongoDb) SetCourseAction(id string, action *Action) error {
 }
 
 /*
-UnsetCourseAction remove action from course
+RemoveCourseAction remove action from course
 @id - course id
 @userId - user id
 */
-func (ctx *ContextMongoDb) UnsetCourseAction(id string, userId string) error {
+func (ctx *ContextMongoDb) RemoveCourseAction(id string, userId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	filter := bson.D{{"_id", id}}
