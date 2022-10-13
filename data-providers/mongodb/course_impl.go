@@ -121,6 +121,7 @@ func (ctx *ContextMongoDb) AddCourse(course *Course) (string, error) {
 	}
 
 	id := result.InsertedID.(primitive.ObjectID)
+	course.Id = id
 
 	return id.Hex(), err
 }
@@ -197,13 +198,46 @@ RemoveCourseAuthors delete authors from course
 func (ctx *ContextMongoDb) RemoveCourseAuthors(id string, aids []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	filter := bson.D{{"_id", id}}
+	objectId, err := primitive.ObjectIDFromHex(id)
 
-	update := bson.D{
-		{"$pullAll", bson.E{Key: "author_ids", Value: aids}},
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "RemoveCourseAuthors",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
 	}
 
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	var objectAids []primitive.ObjectID
+	for _, aid := range aids {
+		objectAid, err := primitive.ObjectIDFromHex(aid)
+
+		if err != nil {
+			return openerrors.OpenDbErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/course_impl.go",
+					Method: "RemoveCourseAuthors",
+				},
+				DbName: ctx.DbName,
+				ConStr: ctx.Uri,
+				DbErr:  err.Error(),
+			}
+		}
+
+		objectAids = append(objectAids, objectAid)
+	}
+
+	filter := bson.D{{"_id", objectId}}
+
+	update := bson.D{
+		{"$pullAll", bson.D{{"author_ids", objectAids}}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{

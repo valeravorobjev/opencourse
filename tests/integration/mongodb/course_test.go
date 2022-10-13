@@ -164,3 +164,45 @@ func TestAddCourseAuthors(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// TestRemoveCourseAuthors
+func TestRemoveCourseAuthors(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	authorIds := []string{course.Authors[0].Hex(), course.Authors[1].Hex()}
+
+	err = context.RemoveCourseAuthors(id, authorIds)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultCourse, err := context.GetCourse(course.Id.Hex())
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(resultCourse.Authors) > 0 {
+		t.Error("Authors field must be empty")
+	}
+}
