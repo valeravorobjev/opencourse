@@ -4,27 +4,40 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"opencourse/common/openerrors"
 )
 
 /*
 GetCourse return course from db by id
-@cid - course id
+@id - course id
 */
-func (ctx *ContextMongoDb) GetCourse(cid string) (*Course, error) {
+func (ctx *ContextMongoDb) GetCourse(id string) (*Course, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return nil, openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "GetCourse",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
 	filter := bson.D{
-		{"_id", cid},
+		{"_id", objectId},
 	}
 
 	var course Course
-	err := col.FindOne(context.Background(), filter).Decode(&course)
+	err = col.FindOne(context.Background(), filter).Decode(&course)
 
-	if err != nil && err != mongo.ErrNoDocuments {
+	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/course_impl.go",
@@ -68,7 +81,7 @@ func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*Course, error)
 
 	var courses []*Course
 
-	err = cursor.Decode(courses)
+	err = cursor.All(context.Background(), &courses)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{

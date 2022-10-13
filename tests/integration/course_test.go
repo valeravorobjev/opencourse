@@ -16,23 +16,7 @@ func getContext() *mongodb.ContextMongoDb {
 	return context
 }
 
-// TestAddCourse
-func TestAddCourse(t *testing.T) {
-
-	context := getContext()
-
-	err := context.Connect("mongodb://localhost")
-	if err != nil {
-		t.Error(err)
-	}
-
-	defer func() {
-		err = context.Disconnect()
-		if err != nil {
-			t.Error(err)
-		}
-	}()
-
+func getCourse() mongodb.Course {
 	dateCreate := primitive.Timestamp{T: uint32(time.Now().Unix())}
 	course := mongodb.Course{
 		Names: []*mongodb.GlobStr{
@@ -53,12 +37,98 @@ func TestAddCourse(t *testing.T) {
 		Comments:   []*mongodb.Comment{},
 	}
 
+	return course
+}
+
+// TestAddCourse
+func TestAddCourse(t *testing.T) {
+
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
 	id, err := context.AddCourse(&course)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	t.Log(id)
 
+}
+
+// TestGetCourse
+func TestGetCourse(t *testing.T) {
+
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	courseResult, err := context.GetCourse(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(courseResult.Id.String())
+}
+
+// TestGetCourses
+func TestGetCourses(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	for i := 0; i < 10; i++ {
+		course := getCourse()
+		_, err := context.AddCourse(&course)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	courses, err := context.GetCourses(10, 0)
+
+	if len(courses) < 10 {
+		t.Error(err)
+	}
 }
