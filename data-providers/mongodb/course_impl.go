@@ -8,6 +8,27 @@ import (
 	"opencourse/common/openerrors"
 )
 
+// ClearCourseCollection remove all data from course collection
+func (ctx *ContextMongoDb) ClearCourseCollection() error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	_, err := col.DeleteMany(context.Background(), bson.D{{}})
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ClearCourseCollection",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
 /*
 GetCourse return course from db by id
 @id - course id
@@ -268,7 +289,7 @@ func (ctx *ContextMongoDb) AddCourseAction(id string, action *Action) error {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/course_impl.go",
-				Method: "SetCourseAction",
+				Method: "AddCourseAction",
 			},
 			DbName: ctx.DbName,
 			ConStr: ctx.Uri,
@@ -289,7 +310,7 @@ func (ctx *ContextMongoDb) AddCourseAction(id string, action *Action) error {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/course_impl.go",
-				Method: "SetCourseAction",
+				Method: "AddCourseAction",
 			},
 			DbName: ctx.DbName,
 			ConStr: ctx.Uri,
@@ -308,24 +329,39 @@ RemoveCourseAction remove action from course
 func (ctx *ContextMongoDb) RemoveCourseAction(id string, userId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	filter := bson.D{{"_id", id}}
-
-	//TODO:: check work or not
-	update := bson.D{
-		{"$pull",
-			bson.D{
-				{"actions", bson.E{Key: "user_id", Value: userId}},
-			},
-		},
-	}
-
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	objectId, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/course_impl.go",
-				Method: "UnsetCourseAction",
+				Method: "RemoveCourseAction",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
+
+	filter := bson.D{{"_id", objectId}}
+
+	update := bson.D{
+		{"$pull",
+			bson.D{
+				{"actions", bson.D{{"user_id", objectUserId}}},
+			},
+		},
+	}
+
+	_, err = col.UpdateOne(context.Background(), filter, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "RemoveCourseAction",
 			},
 			DbName: ctx.DbName,
 			ConStr: ctx.Uri,
