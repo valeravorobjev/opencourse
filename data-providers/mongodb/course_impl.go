@@ -439,10 +439,24 @@ func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text strin
 		}
 	}
 
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
 	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
 
 	find := bson.D{
-		{"_id", id},
+		{"_id", objectId},
 	}
 
 	update := bson.D{
@@ -474,15 +488,55 @@ RemoveCourseComment remove comment from course
 func (ctx *ContextMongoDb) RemoveCourseComment(id string, commentId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
+	objectCommentId, err := primitive.ObjectIDFromHex(commentId)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "RemoveCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "RemoveCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
 	find := bson.D{
-		{"_id", id}, {"comments.id", commentId},
+		{"_id", objectId},
 	}
 
 	update := bson.D{
-		{"$pop", bson.D{{"comments", 1}}},
+		{"$pull",
+			bson.D{
+				{"comments", bson.D{
+					{"$or", bson.A{
+						bson.D{
+							{"id", objectCommentId},
+						},
+						bson.D{
+							{"parent_id", objectCommentId},
+						},
+					}}},
+				}},
+		},
 	}
 
-	_, err := col.UpdateOne(context.Background(), find, update)
+	_, err = col.UpdateOne(context.Background(), find, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{

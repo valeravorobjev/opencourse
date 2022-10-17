@@ -397,3 +397,81 @@ func TestChangeCourseAction(t *testing.T) {
 		t.Error("Course must = 1 and ActionType = ActionDislike")
 	}
 }
+
+// TestAddCourseComment
+func TestAddCourseComment(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userId := primitive.NewObjectID()
+
+	_, err = context.AddCourseComment(id, userId.Hex(), "My comment")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
+
+// TestRemoveCourseComment
+func TestRemoveCourseComment(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userId := primitive.NewObjectID()
+
+	commentId, err := context.AddCourseComment(id, userId.Hex(), "My comment")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	commentId, err = context.AddCourseComment(id, userId.Hex(), "My comment")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.RemoveCourseComment(id, commentId)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
