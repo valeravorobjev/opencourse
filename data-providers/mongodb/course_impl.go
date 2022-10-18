@@ -481,6 +481,87 @@ func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text strin
 }
 
 /*
+ReplyCourseComment reply course comment
+@id - course id
+@userId - user id
+@commentId - comment id
+@text - comment's text
+*/
+func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentId string, text string) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ReplyCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ReplyCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	objectCommentId, err := primitive.ObjectIDFromHex(commentId)
+
+	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, Actions: []*Action{},
+		ParentId: objectCommentId}
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ReplyCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	find := bson.D{
+		{"_id", objectId},
+		{"comments.parent_id", objectCommentId},
+	}
+
+	update := bson.D{
+		{"$push", comment},
+	}
+
+	_, err = col.UpdateOne(context.Background(), find, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "ReplyCourseComment",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
+/*
 RemoveCourseComment remove comment from course
 @id - course id
 @commentId - comment id

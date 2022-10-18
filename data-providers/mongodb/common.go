@@ -4,11 +4,11 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Comment for post, course, etc..
 type Comment struct {
-	Id       primitive.ObjectID    `bson:"id"`        // Comment id
-	UserId   primitive.ObjectID    `bson:"user_id"`   // User id
-	Text     string                `bson:"text"`      // Comment text
-	Actions  []*Action             `bson:"actions"`   // Actions for comment
-	ParentId []*primitive.ObjectID `bson:"parent_id"` // ParentId parent's comment id
+	Id       primitive.ObjectID `bson:"id"`                  // Comment id
+	UserId   primitive.ObjectID `bson:"user_id"`             // User id
+	Text     string             `bson:"text"`                // Comment text
+	Actions  []*Action          `bson:"actions,omitempty"`   // Actions for comment
+	ParentId primitive.ObjectID `bson:"parent_id,omitempty"` // ParentId parent's comment id
 }
 
 // Action of user
@@ -19,8 +19,8 @@ type Action struct {
 
 // PostContent contains text and media data for stages
 type PostContent struct {
-	Body       *GlobStr `bson:"body"`        // Post's body
-	MediaItems []string `bson:"media_items"` // Various attachments
+	Body       *GlobStr `bson:"body"`                  // Post's body
+	MediaItems []string `bson:"media_items,omitempty"` // Various attachments
 }
 
 // SubCategory for category
