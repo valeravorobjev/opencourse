@@ -431,6 +431,59 @@ func TestAddCourseComment(t *testing.T) {
 
 }
 
+// TestReplyCourseComment
+func TestReplyCourseComment(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userId := primitive.NewObjectID()
+
+	commentId, err := context.AddCourseComment(id, userId.Hex(), "My comment")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.ReplyCourseComment(id, userId.Hex(), commentId, "reply reply reply")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultCourse, err := context.GetCourse(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(resultCourse.Comments) != 2 {
+		t.Error("course must contains 2 comments")
+	}
+
+	if resultCourse.Comments[0].Id != resultCourse.Comments[1].ParentId {
+		t.Error("reply comment parentId != base comment id")
+	}
+
+}
+
 // TestRemoveCourseComment
 func TestRemoveCourseComment(t *testing.T) {
 	context := getContext()

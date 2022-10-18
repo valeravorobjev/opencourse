@@ -520,9 +520,6 @@ func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentI
 
 	objectCommentId, err := primitive.ObjectIDFromHex(commentId)
 
-	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, Actions: []*Action{},
-		ParentId: objectCommentId}
-
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
@@ -535,13 +532,17 @@ func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentI
 		}
 	}
 
+	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, ParentId: objectCommentId}
+
 	find := bson.D{
 		{"_id", objectId},
-		{"comments.parent_id", objectCommentId},
+		{"comments.id", objectCommentId},
 	}
 
 	update := bson.D{
-		{"$push", comment},
+		{"$push", bson.D{
+			{"comments", comment},
+		}},
 	}
 
 	_, err = col.UpdateOne(context.Background(), find, update)
