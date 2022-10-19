@@ -634,3 +634,107 @@ func (ctx *ContextMongoDb) RemoveCourseComment(id string, commentId string) erro
 
 	return nil
 }
+
+/*
+AddCourseTags - add tags to course
+@id - course id
+@tags - tags
+*/
+func (ctx *ContextMongoDb) AddCourseTags(id string, tags []*GlobStr) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseTags",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	find := bson.D{
+		{"_id", objectId},
+	}
+
+	update := bson.D{
+		{"$push", bson.D{
+			{
+				"tags", bson.D{{
+					"$each", tags,
+				}},
+			},
+		}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), find, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseTags",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}
+
+/*
+RemoveCourseTags - remove tags from course
+@id - course id
+@tags - tags
+*/
+func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []*GlobStr) error {
+	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseTags",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	find := bson.D{
+		{"_id", objectId},
+	}
+
+	update := bson.D{
+		{"$pullAll", bson.D{
+			{
+				"tags", tags,
+			},
+		}},
+	}
+
+	_, err = col.UpdateOne(context.Background(), find, update)
+
+	if err != nil {
+		return openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourseTags",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
+}

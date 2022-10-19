@@ -528,3 +528,101 @@ func TestRemoveCourseComment(t *testing.T) {
 	}
 
 }
+
+// TestAddCourseTags
+func TestAddCourseTags(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.AddCourseTags(id, []*mongodb.GlobStr{
+		{Lang: mongodb.LangEn, Text: "C#"},
+		{Lang: mongodb.LangEn, Text: "C++"},
+		{Lang: mongodb.LangEn, Text: "Java"},
+		{Lang: mongodb.LangEn, Text: "Golang"},
+		{Lang: mongodb.LangEn, Text: "MongoDB"},
+		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultCourse, err := context.GetCourse(id)
+
+	if len(resultCourse.Tags) != 6 {
+		t.Error("course must contains 6 tags")
+	}
+}
+
+// TestRemoveCourseTags
+func TestRemoveCourseTags(t *testing.T) {
+	context := getContext()
+
+	err := context.Connect("mongodb://localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err = context.Disconnect()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	course := getCourse()
+	id, err := context.AddCourse(&course)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.AddCourseTags(id, []*mongodb.GlobStr{
+		{Lang: mongodb.LangEn, Text: "C#"},
+		{Lang: mongodb.LangEn, Text: "C++"},
+		{Lang: mongodb.LangEn, Text: "Java"},
+		{Lang: mongodb.LangEn, Text: "Golang"},
+		{Lang: mongodb.LangEn, Text: "MongoDB"},
+		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = context.RemoveCourseTags(id, []*mongodb.GlobStr{
+		{Lang: mongodb.LangEn, Text: "C#"},
+		{Lang: mongodb.LangEn, Text: "Golang"},
+		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	})
+
+	resultCourse, err := context.GetCourse(id)
+
+	if len(resultCourse.Tags) != 4 {
+		t.Error("course must contains 4 tags")
+	}
+
+	for _, tag := range resultCourse.Tags {
+		if tag.Lang == mongodb.LangEn && (tag.Text == "C#" || tag.Text == "Golang" || tag.Text == "PostgreSQL") {
+			t.Error("the selected tests are not deleted")
+		}
+	}
+}
