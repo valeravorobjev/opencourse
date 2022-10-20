@@ -5,7 +5,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"opencourse/common"
 	"opencourse/common/openerrors"
+	"time"
 )
 
 // ClearCourseCollection remove all data from course collection
@@ -80,7 +82,7 @@ GetCourses return courses from db
 
 TODO: Now, courses range by rating and date. Need to upgrade rage system
 */
-func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*Course, error) {
+func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.OpenCourse, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	ops := options.Find().SetLimit(take).SetSkip(skip).
@@ -116,16 +118,119 @@ func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*Course, error)
 		}
 	}
 
-	return courses, nil
+	var openCourses []*common.OpenCourse
+
+	for _, course := range courses {
+		openCourse, err := course.ToOpenCourse()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/course_impl.go",
+					Method: "GetCourses",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openCourses = append(openCourses, openCourse)
+	}
+
+	return openCourses, nil
 }
 
 /*
 AddCourse add course to db
+userId - user id how create new course. He also set to course authors
 @course - entity for save to db
 */
-func (ctx *ContextMongoDb) AddCourse(course *Course) (string, error) {
+func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenAddCourseQuery) (string, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	var course Course
+
+	courseName := &GlobStr{}
+
+	err := courseName.ToGlobStr(addCourseQuery.Name)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourse",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	course.Names = append(course.Names, courseName)
+
+	categoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourse",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	course.CategoryId = categoryId
+	course.SubCategoryNumber = addCourseQuery.SubCategoryNumber
+	course.HeaderImg = addCourseQuery.HeaderImg
+
+	if addCourseQuery.Tags != nil && len(addCourseQuery.Tags) > 0 {
+		course.Tags = []*GlobStr{}
+
+		for _, openTag := range addCourseQuery.Tags {
+			tag := &GlobStr{}
+
+			err = tag.ToGlobStr(openTag)
+
+			if err != nil {
+				return "", openerrors.OpenDbErr{
+					BaseErr: openerrors.OpenBaseErr{
+						File:   "data-providers/mongodb/course_impl.go",
+						Method: "AddCourse",
+					},
+					DbName: ctx.DbName,
+					ConStr: ctx.Uri,
+					DbErr:  err.Error(),
+				}
+			}
+
+			course.Tags = append(course.Tags, tag)
+		}
+	}
+
+	authorId, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourse",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	course.AuthorIds = []primitive.ObjectID{authorId}
+	course.Rating = 0
+
+	nowUtcTime := time.Now().Unix()
+
+	course.DateCreate = primitive.Timestamp{T: uint32(nowUtcTime)}
+	course.DateUpdate = primitive.Timestamp{T: uint32(nowUtcTime)}
 
 	result, err := col.InsertOne(context.Background(), course)
 

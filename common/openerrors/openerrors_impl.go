@@ -20,6 +20,11 @@ func (err OpenFieldEmptyErr) Error() string {
 	return fmt.Sprintf("%s | message: field %s is empty", err.BaseErr.Error(), err.Field)
 }
 
+// OpenModelNilOrEmptyErr implementation
+func (err OpenModelNilOrEmptyErr) Error() string {
+	return fmt.Sprintf("%s | message: field %s is empty", err.BaseErr.Error(), err.Model)
+}
+
 // OpenMinLenErr implementation
 func (err OpenMinLenErr) Error() string {
 	return fmt.Sprintf("%s | message: field %s length is less than %d",

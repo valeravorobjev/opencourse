@@ -15,10 +15,16 @@ type OpenDefaultErr struct {
 	Msg     string      // Error text message
 }
 
-// OpenFieldEmptyErr Error if required field is empty
+// OpenFieldEmptyErr error if required field is empty in the model
 type OpenFieldEmptyErr struct {
 	BaseErr OpenBaseErr // File contains error
 	Field   string      // Field name
+}
+
+// OpenModelNilOrEmptyErr error if model parameter nil or empty
+type OpenModelNilOrEmptyErr struct {
+	BaseErr OpenBaseErr // File contains error
+	Model   string      // Model name
 }
 
 // OpenMinLenErr Error not matching the minimum length
