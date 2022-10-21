@@ -16,7 +16,7 @@ import (
 AddUser create user and save his to database
 @createUserQuery - create user model
 */
-func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenCreateUserQuery) (string, error) {
+func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(UserCollection)
 
 	// Validate create user model
@@ -74,7 +74,7 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenCreateUserQuery) 
 
 	for _, role := range createUserQuery.Roles {
 		switch role {
-		case RoleUser, RoleAuthor, RoleAdmin:
+		case common.OpenRoleUser, common.OpenRoleAuthor, common.OpenRoleAdmin:
 			continue
 		default:
 			return "", openerrors.OpenRoleUnknownErr{
@@ -83,7 +83,7 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenCreateUserQuery) 
 					Method: "AddUser",
 				},
 				Role:  role,
-				Roles: []string{RoleUser, RoleAuthor, RoleAdmin},
+				Roles: []string{common.OpenRoleUser, common.OpenRoleAuthor, common.OpenRoleAdmin},
 			}
 		}
 	}

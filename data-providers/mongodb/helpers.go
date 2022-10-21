@@ -8,6 +8,10 @@ import (
 )
 
 /*
+This file contains methods for mapping common (Open) models to MongoDB models
+*/
+
+/*
 ToOpenGlobStr map GlobStr to OpenGlobStr
 */
 func (globStr *GlobStr) ToOpenGlobStr() (*common.OpenGlobStr, error) {

@@ -15,6 +15,7 @@ type User struct {
 // Category of curses collection
 type Category struct {
 	Id            primitive.ObjectID `bson:"_id,omitempty"`            // Category id
+	Langs         []string           `bson:"langs"`                    // Support languages
 	Names         []*GlobStr         `bson:"names"`                    // Category names
 	SubCategories []*SubCategory     `bson:"sub_categories,omitempty"` // Sub categories
 }
@@ -37,6 +38,7 @@ type Stage struct {
 type Course struct {
 	Id                primitive.ObjectID   `bson:"_id,omitempty"`       // Course id
 	AuthorIds         []primitive.ObjectID `bson:"author_ids"`          // Course author ids
+	Langs             []string             `bson:"langs"`               // Support languages
 	Names             []*GlobStr           `bson:"names"`               // Course names
 	CategoryId        primitive.ObjectID   `bson:"category_id"`         // Course category
 	SubCategoryNumber int                  `bson:"sub_category_number"` // Course sub category

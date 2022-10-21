@@ -39,7 +39,7 @@ type OpenUser struct {
 	Roles  []string `json:"roles"`  // User roles
 }
 
-// OpenCreateUserQuery model for create user
+// OpenAddUserQuery model for create user
 type OpenAddUserQuery struct {
 	Login    string   `json:"login"`    // User login
 	Password string   `json:"password"` // User password
@@ -49,27 +49,32 @@ type OpenAddUserQuery struct {
 	Roles    []string `json:"roles"`    // User roles
 }
 
+// OpenGlobStr global text
 type OpenGlobStr struct {
 	Lang string `bson:"lang"` // LangType is a type of text language.
 	Text string `bson:"text"` // Text specific for language type
 }
 
+// OpenSubCategory sub category
 type OpenSubCategory struct {
 	Number int          `json:"number"`
 	Name   *OpenGlobStr `json:"name"`
 }
 
+// OpenCategory category for course
 type OpenCategory struct {
 	Id            string             `json:"id"`
 	Name          *OpenGlobStr       `json:"name"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 
+// OpenAddCategoryQuery model for create category
 type OpenAddCategoryQuery struct {
 	Name          *OpenGlobStr       `json:"name"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 
+// OpenUpdateCategoryQuery model for update category
 type OpenUpdateCategoryQuery struct {
 	CategoryId    string             `json:"category_id"`
 	Name          *OpenGlobStr       `json:"name"`
@@ -80,6 +85,7 @@ type OpenUpdateCategoryQuery struct {
 type OpenCourse struct {
 	Id                string         `json:"id"`                  // Course id
 	AuthorIds         []string       `json:"author_ids"`          // Course authors ids
+	Langs             []string       `json:"langs"`               // Support languages
 	Names             []*OpenGlobStr `json:"names"`               // Course name
 	CategoryId        string         `json:"category_id"`         // Course category
 	SubCategoryNumber int            `json:"sub_category_number"` // Course sub category
@@ -92,6 +98,7 @@ type OpenCourse struct {
 	Comments          []*OpenComment `json:"comments"`            // Comments for this post
 }
 
+// OpenComment user comment
 type OpenComment struct {
 	Id       string        `json:"id"`        // Comment id
 	UserId   string        `json:"user_id"`   // User id
@@ -100,13 +107,16 @@ type OpenComment struct {
 	ParentId string        `json:"parent_id"` // ParentId parent's comment id
 }
 
+// OpenAction user action
 type OpenAction struct {
 	UserId     string `json:"user_id"`
 	ActionType string `json:"action_type"`
 }
 
+// OpenAddCourseQuery add course query
 type OpenAddCourseQuery struct {
-	Name              *OpenGlobStr   `json:"names"`               // Course name
+	Langs             []string       `json:"langs"`               // Support languages
+	Names             []*OpenGlobStr `json:"names"`               // Course name
 	CategoryId        string         `json:"category_id"`         // Course category
 	SubCategoryNumber int            `json:"sub_category_number"` // Course sub category
 	Tags              []*OpenGlobStr `json:"tags"`                // Course tags

@@ -2,10 +2,12 @@ package mongodb
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"opencourse/common"
 	"opencourse/data-providers/mongodb"
 	"testing"
-	"time"
 )
+
+const MongoDbHost = "mongodb://localhost"
 
 func getContext() *mongodb.ContextMongoDb {
 	context := &mongodb.ContextMongoDb{}
@@ -16,34 +18,28 @@ func getContext() *mongodb.ContextMongoDb {
 	return context
 }
 
-func getCourse() mongodb.Course {
-	dateCreate := primitive.Timestamp{T: uint32(time.Now().Unix())}
-	course := mongodb.Course{
-		Names: []*mongodb.GlobStr{
-			{Lang: mongodb.LangEn, Text: "This is a test"},
-			{Lang: mongodb.LangFr, Text: "C' est un test"},
+func getAddCourseQuery() common.OpenAddCourseQuery {
+	addCourseQuery := common.OpenAddCourseQuery{
+		Names: []*common.OpenGlobStr{
+			{Lang: common.OpenLangEn, Text: "This is a test"},
+			{Lang: common.OpenLangFr, Text: "C' est un test"},
 		},
-		Authors:     []primitive.ObjectID{primitive.NewObjectID(), primitive.NewObjectID()},
-		Category:    primitive.NewObjectID(),
-		SubCategory: 12,
-		BannerImg:   "",
-		Tags: []*mongodb.GlobStr{
-			{Text: "Test", Lang: mongodb.LangEn},
+		Langs:             []string{common.OpenLangEn, common.OpenLangFr},
+		CategoryId:        primitive.NewObjectID().Hex(),
+		SubCategoryNumber: 12,
+		Tags: []*common.OpenGlobStr{
+			{Text: "Test", Lang: common.OpenLangEn},
 		},
-		DateCreate: dateCreate,
-		DateUpdate: dateCreate,
-		Rating:     0,
-		Actions:    []*mongodb.Action{},
-		Comments:   []*mongodb.Comment{},
+		HeaderImg: "",
 	}
 
-	return course
+	return addCourseQuery
 }
 
 func TestMain(m *testing.M) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +71,7 @@ func TestAddCourse(t *testing.T) {
 
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,8 +83,8 @@ func TestAddCourse(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -115,9 +111,9 @@ func TestGetCourse(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
+	addCourseQeury := getAddCourseQuery()
 
-	id, err := context.AddCourse(&course)
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQeury)
 
 	if err != nil {
 		t.Fatal(err)
@@ -136,7 +132,7 @@ func TestGetCourse(t *testing.T) {
 func TestGetCourses(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,8 +145,8 @@ func TestGetCourses(t *testing.T) {
 	}()
 
 	for i := 0; i < 10; i++ {
-		course := getCourse()
-		_, err := context.AddCourse(&course)
+		addCourseQeury := getAddCourseQuery()
+		_, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQeury)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,7 +163,7 @@ func TestGetCourses(t *testing.T) {
 func TestAddCourseAuthors(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,8 +175,8 @@ func TestAddCourseAuthors(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +195,7 @@ func TestAddCourseAuthors(t *testing.T) {
 func TestRemoveCourseAuthors(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,29 +207,35 @@ func TestRemoveCourseAuthors(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	authorIds := []string{course.Authors[0].Hex(), course.Authors[1].Hex()}
+	authorsIds := []string{primitive.NewObjectID().Hex(), primitive.NewObjectID().Hex()}
 
-	err = context.RemoveCourseAuthors(id, authorIds)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	resultCourse, err := context.GetCourse(course.Id.Hex())
+	err = context.AddCourseAuthors(id, authorsIds)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(resultCourse.Authors) > 0 {
-		t.Error("Authors field must be empty")
+	err = context.RemoveCourseAuthors(id, authorsIds)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultCourse, err := context.GetCourse(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(resultCourse.AuthorIds) != 1 {
+		t.Error("AuthorIds must have one author")
 	}
 }
 
@@ -241,7 +243,7 @@ func TestRemoveCourseAuthors(t *testing.T) {
 func TestAddCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -253,30 +255,27 @@ func TestAddCourseAction(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
-	action := mongodb.Action{ActionType: mongodb.ActionLike, UserId: userId}
-
-	err = context.AddCourseAction(id, &action)
+	userId := primitive.NewObjectID().Hex()
+	err = context.AddCourseAction(id, userId, common.OpenActionLike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseAction(id, &action)
+	err = context.AddCourseAction(id, userId, common.OpenActionDislike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	action.ActionType = mongodb.ActionDislike
-	err = context.AddCourseAction(id, &action)
+	err = context.AddCourseAction(id, userId, common.OpenActionLike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -298,7 +297,7 @@ func TestAddCourseAction(t *testing.T) {
 func TestRemoveCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -310,15 +309,15 @@ func TestRemoveCourseAction(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
-	err = context.AddCourseAction(id, &mongodb.Action{UserId: userId, ActionType: mongodb.ActionLike})
+	userId := primitive.NewObjectID().Hex()
+	err = context.AddCourseAction(id, userId, common.OpenActionLike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -334,7 +333,7 @@ func TestRemoveCourseAction(t *testing.T) {
 		t.Error("Course must contains one action")
 	}
 
-	err = context.RemoveCourseAction(id, userId.Hex())
+	err = context.RemoveCourseAction(id, userId)
 
 	if err != nil {
 		t.Fatal(err)
@@ -355,7 +354,7 @@ func TestRemoveCourseAction(t *testing.T) {
 func TestChangeCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -367,21 +366,21 @@ func TestChangeCourseAction(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
-	err = context.AddCourseAction(id, &mongodb.Action{UserId: userId, ActionType: mongodb.ActionLike})
+	userId := primitive.NewObjectID().Hex()
+	err = context.AddCourseAction(id, userId, common.OpenActionLike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.ChangeCourseAction(id, &mongodb.Action{UserId: userId, ActionType: mongodb.ActionDislike})
+	err = context.ChangeCourseAction(id, userId, common.OpenActionDislike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -393,7 +392,7 @@ func TestChangeCourseAction(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(courseResult.Actions) != 1 || courseResult.Actions[0].ActionType != mongodb.ActionDislike {
+	if len(courseResult.Actions) != 1 || courseResult.Actions[0].ActionType != common.OpenActionDislike {
 		t.Error("Course must = 1 and ActionType = ActionDislike")
 	}
 }
@@ -402,7 +401,7 @@ func TestChangeCourseAction(t *testing.T) {
 func TestAddCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -414,16 +413,16 @@ func TestAddCourseComment(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
+	userId := primitive.NewObjectID().Hex()
 
-	_, err = context.AddCourseComment(id, userId.Hex(), "My comment")
+	_, err = context.AddCourseComment(id, userId, "My comment")
 
 	if err != nil {
 		t.Fatal(err)
@@ -435,7 +434,7 @@ func TestAddCourseComment(t *testing.T) {
 func TestReplyCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -447,22 +446,22 @@ func TestReplyCourseComment(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
+	userId := primitive.NewObjectID().Hex()
 
-	commentId, err := context.AddCourseComment(id, userId.Hex(), "My comment")
+	commentId, err := context.AddCourseComment(id, userId, "My comment")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.ReplyCourseComment(id, userId.Hex(), commentId, "reply reply reply")
+	err = context.ReplyCourseComment(id, userId, commentId, "reply reply reply")
 
 	if err != nil {
 		t.Fatal(err)
@@ -488,7 +487,7 @@ func TestReplyCourseComment(t *testing.T) {
 func TestRemoveCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -500,22 +499,22 @@ func TestRemoveCourseComment(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	userId := primitive.NewObjectID()
+	userId := primitive.NewObjectID().Hex()
 
-	commentId, err := context.AddCourseComment(id, userId.Hex(), "My comment")
+	commentId, err := context.AddCourseComment(id, userId, "My comment")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	commentId, err = context.AddCourseComment(id, userId.Hex(), "My comment")
+	commentId, err = context.AddCourseComment(id, userId, "My comment")
 
 	if err != nil {
 		t.Fatal(err)
@@ -533,7 +532,7 @@ func TestRemoveCourseComment(t *testing.T) {
 func TestAddCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -545,20 +544,20 @@ func TestAddCourseTags(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseTags(id, []*mongodb.GlobStr{
-		{Lang: mongodb.LangEn, Text: "C#"},
-		{Lang: mongodb.LangEn, Text: "C++"},
-		{Lang: mongodb.LangEn, Text: "Java"},
-		{Lang: mongodb.LangEn, Text: "Golang"},
-		{Lang: mongodb.LangEn, Text: "MongoDB"},
-		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	err = context.AddCourseTags(id, []*common.OpenGlobStr{
+		{Lang: common.OpenLangEn, Text: "C#"},
+		{Lang: common.OpenLangEn, Text: "C++"},
+		{Lang: common.OpenLangEn, Text: "Java"},
+		{Lang: common.OpenLangEn, Text: "Golang"},
+		{Lang: common.OpenLangEn, Text: "MongoDB"},
+		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
 	})
 
 	if err != nil {
@@ -567,7 +566,7 @@ func TestAddCourseTags(t *testing.T) {
 
 	resultCourse, err := context.GetCourse(id)
 
-	if len(resultCourse.Tags) != 6 {
+	if len(resultCourse.Tags) != 7 {
 		t.Error("course must contains 6 tags")
 	}
 }
@@ -576,7 +575,7 @@ func TestAddCourseTags(t *testing.T) {
 func TestRemoveCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(MongoDbHost)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -588,30 +587,30 @@ func TestRemoveCourseTags(t *testing.T) {
 		}
 	}()
 
-	course := getCourse()
-	id, err := context.AddCourse(&course)
+	addCourseQuery := getAddCourseQuery()
+	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseTags(id, []*mongodb.GlobStr{
-		{Lang: mongodb.LangEn, Text: "C#"},
-		{Lang: mongodb.LangEn, Text: "C++"},
-		{Lang: mongodb.LangEn, Text: "Java"},
-		{Lang: mongodb.LangEn, Text: "Golang"},
-		{Lang: mongodb.LangEn, Text: "MongoDB"},
-		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	err = context.AddCourseTags(id, []*common.OpenGlobStr{
+		{Lang: common.OpenLangEn, Text: "C#"},
+		{Lang: common.OpenLangEn, Text: "C++"},
+		{Lang: common.OpenLangEn, Text: "Java"},
+		{Lang: common.OpenLangEn, Text: "Golang"},
+		{Lang: common.OpenLangEn, Text: "MongoDB"},
+		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
 	})
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.RemoveCourseTags(id, []*mongodb.GlobStr{
-		{Lang: mongodb.LangEn, Text: "C#"},
-		{Lang: mongodb.LangEn, Text: "Golang"},
-		{Lang: mongodb.LangEn, Text: "PostgreSQL"},
+	err = context.RemoveCourseTags(id, []*common.OpenGlobStr{
+		{Lang: common.OpenLangEn, Text: "C#"},
+		{Lang: common.OpenLangEn, Text: "Golang"},
+		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
 	})
 
 	resultCourse, err := context.GetCourse(id)
@@ -621,7 +620,7 @@ func TestRemoveCourseTags(t *testing.T) {
 	}
 
 	for _, tag := range resultCourse.Tags {
-		if tag.Lang == mongodb.LangEn && (tag.Text == "C#" || tag.Text == "Golang" || tag.Text == "PostgreSQL") {
+		if tag.Lang == common.OpenLangEn && (tag.Text == "C#" || tag.Text == "Golang" || tag.Text == "PostgreSQL") {
 			t.Error("the selected tests are not deleted")
 		}
 	}
