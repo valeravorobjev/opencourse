@@ -24,7 +24,7 @@ const (
 // User roles
 const (
 	OpenRoleUser   = "User"          // Simple user role
-	OpenRoleAuthor = "Author"        // Is a author of courses
+	OpenRoleAuthor = "Author"        // Is an author of courses
 	OpenRoleAdmin  = "Administrator" // Privileged user role
 )
 
