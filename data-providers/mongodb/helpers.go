@@ -243,3 +243,98 @@ func (course *Course) ToOpenCourse() (*common.OpenCourse, error) {
 
 	return &openCourse, nil
 }
+
+/*
+ToOpenCategory map Category to OpenCategory
+*/
+func (category *Category) ToOpenCategory() (*common.OpenCategory, error) {
+	if category == nil {
+		return nil, openerrors.OpenModelNilOrEmptyErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/helpers.go",
+				Method: "ToOpenCategory",
+			},
+			Model: "category",
+		}
+	}
+
+	var openCategory common.OpenCategory
+
+	openCategory.Id = category.Id.Hex()
+
+	for _, name := range category.Names {
+
+		openName, err := name.ToOpenGlobStr()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/helpers.go",
+					Method: "ToOpenCategory",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openCategory.Names = append(openCategory.Names, openName)
+	}
+
+	openCategory.Langs = category.Langs
+
+	for _, subCategory := range category.SubCategories {
+
+		openSubCategory, err := subCategory.ToOpenSubCategory()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/helpers.go",
+					Method: "ToOpenCategory",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openCategory.SubCategories = append(openCategory.SubCategories, openSubCategory)
+	}
+
+	return &openCategory, nil
+}
+
+/*
+ToOpenSubCategory map SubCategory to OpenSubCategory
+*/
+func (subCategory *SubCategory) ToOpenSubCategory() (*common.OpenSubCategory, error) {
+	if subCategory == nil {
+		return nil, openerrors.OpenModelNilOrEmptyErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/helpers.go",
+				Method: "ToOpenSubCategory",
+			},
+			Model: "subCategory",
+		}
+	}
+
+	var openSubCategory common.OpenSubCategory
+	openSubCategory.Number = subCategory.Number
+
+	for _, name := range subCategory.Names {
+
+		openName, err := name.ToOpenGlobStr()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/helpers.go",
+					Method: "ToOpenSubCategory",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openSubCategory.Names = append(openSubCategory.Names, openName)
+	}
+
+	return &openSubCategory, nil
+
+}

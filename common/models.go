@@ -57,14 +57,15 @@ type OpenGlobStr struct {
 
 // OpenSubCategory sub category
 type OpenSubCategory struct {
-	Number int          `json:"number"`
-	Name   *OpenGlobStr `json:"name"`
+	Number int            `json:"number"`
+	Names  []*OpenGlobStr `json:"names"`
 }
 
 // OpenCategory category for course
 type OpenCategory struct {
 	Id            string             `json:"id"`
-	Name          *OpenGlobStr       `json:"name"`
+	Langs         []string           `json:"langs"` // Support languages
+	Names         []*OpenGlobStr     `json:"names"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 

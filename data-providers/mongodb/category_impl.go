@@ -6,14 +6,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"opencourse/common"
 	"opencourse/common/openerrors"
 )
 
 // GetCategories return all categories from db
-func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
+func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
-	cursor, err := col.Find(context.Background(), bson.D{})
+	find := bson.D{
+		{"langs", bson.D{
+			{
+				"$in", langs,
+			},
+		}},
+	}
+
+	cursor, err := col.Find(context.Background(), find)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
@@ -42,7 +51,25 @@ func (ctx *ContextMongoDb) GetCategories() ([]*Category, error) {
 		}
 	}
 
-	return categories, nil
+	var openCategories []*common.OpenCategory
+
+	for _, category := range categories {
+		openCategory, err := category.ToOpenCategory()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/category_impl.go",
+					Method: "GetCategories",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openCategories = append(openCategories, openCategory)
+	}
+
+	return openCategories, nil
 }
 
 // AddCategory method for add new category and sub categories to database
