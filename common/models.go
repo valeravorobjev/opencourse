@@ -49,38 +49,32 @@ type OpenAddUserQuery struct {
 	Roles    []string `json:"roles"`    // User roles
 }
 
-// OpenGlobStr global text
-type OpenGlobStr struct {
-	Lang string `bson:"lang"` // LangType is a type of text language.
-	Text string `bson:"text"` // Text specific for language type
-}
-
 // OpenSubCategory sub category
 type OpenSubCategory struct {
-	Number int            `json:"number"`
-	Names  []*OpenGlobStr `json:"names"`
+	Number int    `json:"number"`
+	Name   string `json:"name"`
 }
 
 // OpenCategory category for course
 type OpenCategory struct {
 	Id            string             `json:"id"`
-	Langs         []string           `json:"langs"` // Support languages
-	Names         []*OpenGlobStr     `json:"names"`
+	Lang          string             `json:"lang"` // Support language
+	Name          string             `json:"name"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 
 // OpenAddCategoryQuery model for create category
 type OpenAddCategoryQuery struct {
-	Langs         []string           `json:"langs"` // Support languages
-	Names         []*OpenGlobStr     `json:"names"`
+	Lang          string             `json:"lang"` // Support language
+	Name          string             `json:"name"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 
 // OpenUpdateCategoryQuery model for update category
 type OpenUpdateCategoryQuery struct {
 	CategoryId    string             `json:"category_id"`
-	Langs         []string           `json:"langs"` // Support languages
-	Name          *OpenGlobStr       `json:"name"`
+	Langs         []string           `json:"lang"` // Support language
+	Name          string             `json:"name"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 
@@ -88,11 +82,11 @@ type OpenUpdateCategoryQuery struct {
 type OpenCourse struct {
 	Id                string         `json:"id"`                  // Course id
 	AuthorIds         []string       `json:"author_ids"`          // Course authors ids
-	Langs             []string       `json:"langs"`               // Support languages
-	Names             []*OpenGlobStr `json:"names"`               // Course name
+	Lang              string         `json:"lang"`                // Support language
+	Name              string         `json:"name"`                // Course name
 	CategoryId        string         `json:"category_id"`         // Course category
 	SubCategoryNumber int            `json:"sub_category_number"` // Course sub category
-	Tags              []*OpenGlobStr `json:"tags"`                // Course tags
+	Tags              []string       `json:"tags"`                // Course tags
 	HeaderImg         string         `json:"header_img"`          // Course header image
 	DateCreate        time.Time      `json:"date_create"`         // Create date of course
 	DateUpdate        time.Time      `json:"date_update"`         // Update date of course
@@ -118,10 +112,10 @@ type OpenAction struct {
 
 // OpenAddCourseQuery add course query
 type OpenAddCourseQuery struct {
-	Langs             []string       `json:"langs"`               // Support languages
-	Names             []*OpenGlobStr `json:"names"`               // Course name
-	CategoryId        string         `json:"category_id"`         // Course category
-	SubCategoryNumber int            `json:"sub_category_number"` // Course sub category
-	Tags              []*OpenGlobStr `json:"tags"`                // Course tags
-	HeaderImg         string         `json:"header_img"`          // Course header image
+	Lang              string   `json:"lang"`                // Support languages
+	Name              string   `json:"name"`                // Course name
+	CategoryId        string   `json:"category_id"`         // Course category
+	SubCategoryNumber int      `json:"sub_category_number"` // Course sub category
+	Tags              []string `json:"tags"`                // Course tags
+	HeaderImg         string   `json:"header_img"`          // Course header image
 }

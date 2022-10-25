@@ -19,14 +19,14 @@ type Action struct {
 
 // PostContent contains text and media data for stages
 type PostContent struct {
-	Body       *GlobStr `bson:"body"`                  // Post's body
+	Body       string   `bson:"body"`                  // Post's body
 	MediaItems []string `bson:"media_items,omitempty"` // Various attachments
 }
 
 // SubCategory for category
 type SubCategory struct {
-	Number int        `bson:"number"` // Sub category number
-	Names  []*GlobStr `bson:"names"`  // Sub category names
+	Number int    `bson:"number"` // Sub category number
+	Name   string `bson:"name"`   // Sub category name
 }
 
 // GlobStr contains localization text for some language. Check lang for get language type

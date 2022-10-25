@@ -23,17 +23,12 @@ func getContext() common.DbContext {
 
 func getAddCourseQuery() common.OpenAddCourseQuery {
 	addCourseQuery := common.OpenAddCourseQuery{
-		Names: []*common.OpenGlobStr{
-			{Lang: common.OpenLangEn, Text: "This is a test"},
-			{Lang: common.OpenLangFr, Text: "C' est un test"},
-		},
-		Langs:             []string{common.OpenLangEn, common.OpenLangFr},
+		Name:              "The greatest golang",
+		Lang:              common.OpenLangEn,
 		CategoryId:        primitive.NewObjectID().Hex(),
 		SubCategoryNumber: 12,
-		Tags: []*common.OpenGlobStr{
-			{Text: "Test", Lang: common.OpenLangEn},
-		},
-		HeaderImg: "",
+		Tags:              []string{"Go"},
+		HeaderImg:         "",
 	}
 
 	return addCourseQuery
@@ -159,86 +154,6 @@ func TestGetCourses(t *testing.T) {
 
 	if len(courses) < 10 {
 		t.Error(err)
-	}
-}
-
-// TestAddCourseAuthors
-func TestAddCourseAuthors(t *testing.T) {
-	context := getContext()
-
-	err := context.Connect(ConnectionString)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	defer func() {
-		err = context.Disconnect()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	authorIds := []string{primitive.NewObjectID().Hex(), primitive.NewObjectID().Hex()}
-
-	err = context.AddCourseAuthors(id, authorIds)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-// TestRemoveCourseAuthors
-func TestRemoveCourseAuthors(t *testing.T) {
-	context := getContext()
-
-	err := context.Connect(ConnectionString)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	defer func() {
-		err = context.Disconnect()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	authorsIds := []string{primitive.NewObjectID().Hex(), primitive.NewObjectID().Hex()}
-
-	err = context.AddCourseAuthors(id, authorsIds)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = context.RemoveCourseAuthors(id, authorsIds)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	resultCourse, err := context.GetCourse(id)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(resultCourse.AuthorIds) != 1 {
-		t.Error("AuthorIds must have one author")
 	}
 }
 
@@ -554,13 +469,13 @@ func TestAddCourseTags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseTags(id, []*common.OpenGlobStr{
-		{Lang: common.OpenLangEn, Text: "C#"},
-		{Lang: common.OpenLangEn, Text: "C++"},
-		{Lang: common.OpenLangEn, Text: "Java"},
-		{Lang: common.OpenLangEn, Text: "Golang"},
-		{Lang: common.OpenLangEn, Text: "MongoDB"},
-		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
+	err = context.AddCourseTags(id, []string{
+		"C#",
+		"C++",
+		"Java",
+		"Golang",
+		"MongoDB",
+		"PostgreSQL",
 	})
 
 	if err != nil {
@@ -597,23 +512,23 @@ func TestRemoveCourseTags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseTags(id, []*common.OpenGlobStr{
-		{Lang: common.OpenLangEn, Text: "C#"},
-		{Lang: common.OpenLangEn, Text: "C++"},
-		{Lang: common.OpenLangEn, Text: "Java"},
-		{Lang: common.OpenLangEn, Text: "Golang"},
-		{Lang: common.OpenLangEn, Text: "MongoDB"},
-		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
+	err = context.AddCourseTags(id, []string{
+		"C#",
+		"C++",
+		"Java",
+		"Golang",
+		"MongoDB",
+		"PostgreSQL",
 	})
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.RemoveCourseTags(id, []*common.OpenGlobStr{
-		{Lang: common.OpenLangEn, Text: "C#"},
-		{Lang: common.OpenLangEn, Text: "Golang"},
-		{Lang: common.OpenLangEn, Text: "PostgreSQL"},
+	err = context.RemoveCourseTags(id, []string{
+		"C#",
+		"Golang",
+		"PostgreSQL",
 	})
 
 	resultCourse, err := context.GetCourse(id)
@@ -623,7 +538,7 @@ func TestRemoveCourseTags(t *testing.T) {
 	}
 
 	for _, tag := range resultCourse.Tags {
-		if tag.Lang == common.OpenLangEn && (tag.Text == "C#" || tag.Text == "Golang" || tag.Text == "PostgreSQL") {
+		if tag == "C#" || tag == "Golang" || tag == "PostgreSQL" {
 			t.Error("the selected tests are not deleted")
 		}
 	}

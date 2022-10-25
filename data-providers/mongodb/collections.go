@@ -15,17 +15,16 @@ type User struct {
 // Category of curses collection
 type Category struct {
 	Id            primitive.ObjectID `bson:"_id,omitempty"`            // Category id
-	Langs         []string           `bson:"langs"`                    // Support languages
-	Names         []*GlobStr         `bson:"names"`                    // Category names
+	Lang          string             `bson:"lang"`                     // Language
+	Name          string             `bson:"names"`                    // Category name
 	SubCategories []*SubCategory     `bson:"sub_categories,omitempty"` // Sub categories
 }
 
 // Stage collection
 type Stage struct {
 	Id         primitive.ObjectID  `bson:"_id,omitempty"`      // Stage id
-	AuthorId   primitive.ObjectID  `bson:"author_id"`          // Author id how right stage
 	CourseId   primitive.ObjectID  `bson:"course_id"`          // Course id. One course has many stages
-	Names      []*GlobStr          `bson:"names"`              // Course stage names
+	Name       string              `bson:"names"`              // Course stage name
 	HeaderImg  string              `bson:"header_img"`         // Stage header image
 	Contents   []*PostContent      `bson:"contents"`           // Stage contents
 	DateCreate primitive.Timestamp `bson:"date_create"`        // Create date of course
@@ -36,17 +35,16 @@ type Stage struct {
 
 // Course collection
 type Course struct {
-	Id                primitive.ObjectID   `bson:"_id,omitempty"`       // Course id
-	AuthorIds         []primitive.ObjectID `bson:"author_ids"`          // Course author ids
-	Langs             []string             `bson:"langs"`               // Support languages
-	Names             []*GlobStr           `bson:"names"`               // Course names
-	CategoryId        primitive.ObjectID   `bson:"category_id"`         // Course category
-	SubCategoryNumber int                  `bson:"sub_category_number"` // Course sub category
-	Tags              []*GlobStr           `bson:"tags,omitempty"`      // Course tags
-	HeaderImg         string               `bson:"header_img"`          // Course header image
-	DateCreate        primitive.Timestamp  `bson:"date_create"`         // Create date of course
-	DateUpdate        primitive.Timestamp  `bson:"date_update"`         // Update date of course
-	Rating            int                  `bson:"rating"`              // Course rating
-	Actions           []*Action            `bson:"actions,omitempty"`   // Actions for comments
-	Comments          []*Comment           `bson:"comments,omitempty"`  // Comments for this post
+	Id                primitive.ObjectID  `bson:"_id,omitempty"`       // Course id
+	CategoryId        primitive.ObjectID  `bson:"category_id"`         // Course category
+	SubCategoryNumber int                 `bson:"sub_category_number"` // Course sub category
+	Lang              string              `bson:"lang"`                // Support languages
+	Name              string              `bson:"name"`                // Course names
+	Tags              []string            `bson:"tags,omitempty"`      // Course tags
+	HeaderImg         string              `bson:"header_img"`          // Course header image
+	DateCreate        primitive.Timestamp `bson:"date_create"`         // Create date of course
+	DateUpdate        primitive.Timestamp `bson:"date_update"`         // Update date of course
+	Rating            int                 `bson:"rating"`              // Course rating
+	Actions           []*Action           `bson:"actions,omitempty"`   // Actions for comments
+	Comments          []*Comment          `bson:"comments,omitempty"`  // Comments for this post
 }

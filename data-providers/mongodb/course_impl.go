@@ -161,28 +161,8 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	var course Course
-
-	for _, name := range addCourseQuery.Names {
-		courseName := &GlobStr{}
-
-		err := courseName.ToGlobStr(name)
-
-		if err != nil {
-			return "", openerrors.OpenDbErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
-					Method: "AddCourse",
-				},
-				DbName: ctx.DbName,
-				ConStr: ctx.Uri,
-				DbErr:  err.Error(),
-			}
-		}
-
-		course.Names = append(course.Names, courseName)
-	}
-
-	course.Langs = addCourseQuery.Langs
+	course.Name = addCourseQuery.Name
+	course.Lang = addCourseQuery.Lang
 
 	categoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
 
@@ -201,32 +181,7 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 	course.CategoryId = categoryId
 	course.SubCategoryNumber = addCourseQuery.SubCategoryNumber
 	course.HeaderImg = addCourseQuery.HeaderImg
-
-	if addCourseQuery.Tags != nil && len(addCourseQuery.Tags) > 0 {
-		course.Tags = []*GlobStr{}
-
-		for _, openTag := range addCourseQuery.Tags {
-			tag := &GlobStr{}
-
-			err = tag.ToGlobStr(openTag)
-
-			if err != nil {
-				return "", openerrors.OpenDbErr{
-					BaseErr: openerrors.OpenBaseErr{
-						File:   "data-providers/mongodb/course_impl.go",
-						Method: "AddCourse",
-					},
-					DbName: ctx.DbName,
-					ConStr: ctx.Uri,
-					DbErr:  err.Error(),
-				}
-			}
-
-			course.Tags = append(course.Tags, tag)
-		}
-	}
-
-	authorId, err := primitive.ObjectIDFromHex(userId)
+	course.Tags = addCourseQuery.Tags
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
@@ -239,8 +194,6 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 			DbErr:  err.Error(),
 		}
 	}
-
-	course.AuthorIds = []primitive.ObjectID{authorId}
 	course.Rating = 0
 
 	nowUtcTime := time.Now().Unix()
@@ -266,134 +219,6 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 	course.Id = id
 
 	return id.Hex(), err
-}
-
-/*
-AddCourseAuthors add authors to course
-@id - course id
-@aids - authors ids
-*/
-func (ctx *ContextMongoDb) AddCourseAuthors(id string, aids []string) error {
-	col := ctx.Client.Database(DbName).Collection(CourseCollection)
-
-	objectId, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
-				Method: "AddCourseAuthors",
-			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
-		}
-	}
-
-	var objectAids []primitive.ObjectID
-	for _, aid := range aids {
-		objectAid, err := primitive.ObjectIDFromHex(aid)
-
-		if err != nil {
-			return openerrors.OpenDbErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
-					Method: "AddCourseAuthors",
-				},
-				DbName: ctx.DbName,
-				ConStr: ctx.Uri,
-				DbErr:  err.Error(),
-			}
-		}
-
-		objectAids = append(objectAids, objectAid)
-	}
-
-	filter := bson.D{{"_id", objectId}}
-
-	update := bson.D{
-		{"$push", bson.D{{"author_ids", bson.D{{"$each", objectAids}}}}},
-	}
-
-	_, err = col.UpdateOne(context.Background(), filter, update)
-
-	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
-				Method: "AddCourseAuthors",
-			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
-		}
-	}
-
-	return nil
-}
-
-/*
-RemoveCourseAuthors delete authors from course
-@id - course id
-@aids - authors ids
-*/
-func (ctx *ContextMongoDb) RemoveCourseAuthors(id string, aids []string) error {
-	col := ctx.Client.Database(DbName).Collection(CourseCollection)
-
-	objectId, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
-				Method: "RemoveCourseAuthors",
-			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
-		}
-	}
-
-	var objectAids []primitive.ObjectID
-	for _, aid := range aids {
-		objectAid, err := primitive.ObjectIDFromHex(aid)
-
-		if err != nil {
-			return openerrors.OpenDbErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
-					Method: "RemoveCourseAuthors",
-				},
-				DbName: ctx.DbName,
-				ConStr: ctx.Uri,
-				DbErr:  err.Error(),
-			}
-		}
-
-		objectAids = append(objectAids, objectAid)
-	}
-
-	filter := bson.D{{"_id", objectId}}
-
-	update := bson.D{
-		{"$pullAll", bson.D{{"author_ids", objectAids}}},
-	}
-
-	_, err = col.UpdateOne(context.Background(), filter, update)
-
-	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
-				Method: "RemoveCourseAuthors",
-			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
-		}
-	}
-
-	return nil
 }
 
 /*
@@ -793,7 +618,7 @@ AddCourseTags - add tags to course
 @id - course id
 @tags - tags
 */
-func (ctx *ContextMongoDb) AddCourseTags(id string, tags []*common.OpenGlobStr) error {
+func (ctx *ContextMongoDb) AddCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -810,28 +635,6 @@ func (ctx *ContextMongoDb) AddCourseTags(id string, tags []*common.OpenGlobStr) 
 		}
 	}
 
-	var mongoTags []*GlobStr
-
-	for _, tag := range tags {
-
-		mongoTag := &GlobStr{}
-		err = mongoTag.ToGlobStr(tag)
-
-		if err != nil {
-			return openerrors.OpenDbErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
-					Method: "AddCourseTags",
-				},
-				DbName: ctx.DbName,
-				ConStr: ctx.Uri,
-				DbErr:  err.Error(),
-			}
-		}
-
-		mongoTags = append(mongoTags, mongoTag)
-	}
-
 	find := bson.D{
 		{"_id", objectId},
 	}
@@ -840,7 +643,7 @@ func (ctx *ContextMongoDb) AddCourseTags(id string, tags []*common.OpenGlobStr) 
 		{"$push", bson.D{
 			{
 				"tags", bson.D{{
-					"$each", mongoTags,
+					"$each", tags,
 				}},
 			},
 		}},
@@ -868,7 +671,7 @@ RemoveCourseTags - remove tags from course
 @id - course id
 @tags - tags
 */
-func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []*common.OpenGlobStr) error {
+func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -885,28 +688,6 @@ func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []*common.OpenGlobSt
 		}
 	}
 
-	var mongoTags []*GlobStr
-
-	for _, tag := range tags {
-
-		mongoTag := &GlobStr{}
-		err = mongoTag.ToGlobStr(tag)
-
-		if err != nil {
-			return openerrors.OpenDbErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
-					Method: "AddCourseTags",
-				},
-				DbName: ctx.DbName,
-				ConStr: ctx.Uri,
-				DbErr:  err.Error(),
-			}
-		}
-
-		mongoTags = append(mongoTags, mongoTag)
-	}
-
 	find := bson.D{
 		{"_id", objectId},
 	}
@@ -914,7 +695,7 @@ func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []*common.OpenGlobSt
 	update := bson.D{
 		{"$pullAll", bson.D{
 			{
-				"tags", mongoTags,
+				"tags", tags,
 			},
 		}},
 	}
