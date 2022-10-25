@@ -73,8 +73,42 @@ func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory
 }
 
 // AddCategory method for add new category and sub categories to database
-func (ctx *ContextMongoDb) AddCategory(category *Category) (string, error) {
+func (ctx *ContextMongoDb) AddCategory(addCategoryQuery *common.OpenAddCategoryQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
+
+	category := Category{}
+
+	names, err := ToGlobStrs(addCategoryQuery.Names)
+
+	if err != nil {
+		return "", openerrors.OpenDefaultErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "AddCategory",
+			},
+			Msg: err.Error(),
+		}
+	}
+
+	category.Names = names
+
+	for _, openSubCategory := range addCategoryQuery.SubCategories {
+
+		names, err := ToGlobStrs(openSubCategory.Names)
+
+		if err != nil {
+			return "", openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/category_impl.go",
+					Method: "AddCategory",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		subCategory := &SubCategory{Number: openSubCategory.Number, Names: names}
+		category.SubCategories = append(category.SubCategories, subCategory)
+	}
 
 	result, err := col.InsertOne(context.Background(), category)
 
@@ -100,8 +134,20 @@ UpdateCategory update category name
 @cid - category id
 @names - category names
 */
-func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*GlobStr) error {
+func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*common.OpenGlobStr) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
+
+	mongoNames, err := ToGlobStrs(names)
+
+	if err != nil {
+		return openerrors.OpenDefaultErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "UpdateCategory",
+			},
+			Msg: err.Error(),
+		}
+	}
 
 	filter := bson.D{
 		{"_id", cid},
@@ -109,11 +155,11 @@ func (ctx *ContextMongoDb) UpdateCategory(cid string, names []*GlobStr) error {
 
 	update := bson.D{
 		{
-			"$set", bson.D{{"names", names}},
+			"$set", bson.D{{"names", mongoNames}},
 		},
 	}
 
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{
@@ -136,8 +182,20 @@ UpdateSubCategory update sub category names
 @scn - sub category number
 @names - sub category names
 */
-func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, names []*GlobStr) error {
+func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, names []*common.OpenGlobStr) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
+
+	mongoNames, err := ToGlobStrs(names)
+
+	if err != nil {
+		return openerrors.OpenDefaultErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/category_impl.go",
+				Method: "UpdateCategory",
+			},
+			Msg: err.Error(),
+		}
+	}
 
 	filter := bson.D{
 		{"$and", bson.A{
@@ -148,11 +206,11 @@ func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, names []*GlobS
 
 	update := bson.D{
 		{
-			"$set", bson.D{{"sub_categories.$.names", names}},
+			"$set", bson.D{{"sub_categories.$.names", mongoNames}},
 		},
 	}
 
-	_, err := col.UpdateOne(context.Background(), filter, update)
+	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
 		return openerrors.OpenDbErr{

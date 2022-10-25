@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// ClearCourseCollection remove all data from course collection
-func (ctx *ContextMongoDb) ClearCourseCollection() error {
+// ClearCourses remove all data from course collection
+func (ctx *ContextMongoDb) ClearCourses() error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	_, err := col.DeleteMany(context.Background(), bson.D{{}})
@@ -35,7 +35,7 @@ func (ctx *ContextMongoDb) ClearCourseCollection() error {
 GetCourse return course from db by id
 @id - course id
 */
-func (ctx *ContextMongoDb) GetCourse(id string) (*Course, error) {
+func (ctx *ContextMongoDb) GetCourse(id string) (*common.OpenCourse, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
@@ -72,7 +72,19 @@ func (ctx *ContextMongoDb) GetCourse(id string) (*Course, error) {
 		}
 	}
 
-	return &course, nil
+	openCourse, err := course.ToOpenCourse()
+
+	if err != nil {
+		return nil, openerrors.OpenDefaultErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "GetCourse",
+			},
+			Msg: err.Error(),
+		}
+	}
+
+	return openCourse, nil
 }
 
 /*

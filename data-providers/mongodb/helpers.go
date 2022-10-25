@@ -31,6 +31,80 @@ func (globStr *GlobStr) ToOpenGlobStr() (*common.OpenGlobStr, error) {
 }
 
 /*
+ToOpenGlobStrs map GlobStr array to OpenGlobStr array
+*/
+func ToOpenGlobStrs(globStrs []*GlobStr) ([]*common.OpenGlobStr, error) {
+	if globStrs == nil || len(globStrs) == 0 {
+		return nil, openerrors.OpenModelNilOrEmptyErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/helpers.go",
+				Method: "ToOpenGlobStrs",
+			},
+			Model: "globStrs",
+		}
+	}
+
+	var openGlobStrs []*common.OpenGlobStr
+
+	for _, globStr := range globStrs {
+
+		openGlobStr, err := globStr.ToOpenGlobStr()
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/helpers.go",
+					Method: "ToOpenGlobStrs",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		openGlobStrs = append(openGlobStrs, openGlobStr)
+	}
+
+	return openGlobStrs, nil
+}
+
+/*
+ToGlobStrs map OpenGlobStr array to GlobStr array
+*/
+func ToGlobStrs(openGlobStrs []*common.OpenGlobStr) ([]*GlobStr, error) {
+	if openGlobStrs == nil || len(openGlobStrs) == 0 {
+		return nil, openerrors.OpenModelNilOrEmptyErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/helpers.go",
+				Method: "ToGlobStrs",
+			},
+			Model: "openGlobStrs",
+		}
+	}
+
+	var globStrs []*GlobStr
+
+	for _, openGlobStr := range openGlobStrs {
+
+		globStr := &GlobStr{}
+
+		err := globStr.ToGlobStr(openGlobStr)
+
+		if err != nil {
+			return nil, openerrors.OpenDefaultErr{
+				BaseErr: openerrors.OpenBaseErr{
+					File:   "data-providers/mongodb/helpers.go",
+					Method: "ToGlobStrs",
+				},
+				Msg: err.Error(),
+			}
+		}
+
+		globStrs = append(globStrs, globStr)
+	}
+
+	return globStrs, nil
+}
+
+/*
 ToGlobStr map OpenGlobStr to GlobStr
 */
 func (globStr *GlobStr) ToGlobStr(openGlobStr *common.OpenGlobStr) error {

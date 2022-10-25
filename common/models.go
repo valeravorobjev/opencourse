@@ -72,7 +72,7 @@ type OpenCategory struct {
 // OpenAddCategoryQuery model for create category
 type OpenAddCategoryQuery struct {
 	Langs         []string           `json:"langs"` // Support languages
-	Name          *OpenGlobStr       `json:"name"`
+	Names         []*OpenGlobStr     `json:"names"`
 	SubCategories []*OpenSubCategory `json:"sub_categories"`
 }
 

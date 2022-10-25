@@ -1,4 +1,4 @@
-package mongodb
+package integration
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -7,10 +7,13 @@ import (
 	"testing"
 )
 
-const MongoDbHost = "mongodb://localhost"
+const ConnectionString = "mongodb://localhost"
 
-func getContext() *mongodb.ContextMongoDb {
-	context := &mongodb.ContextMongoDb{}
+func getContext() common.DbContext {
+
+	var context common.DbContext
+
+	context = &mongodb.ContextMongoDb{}
 
 	// Init default values
 	context.Defaults()
@@ -39,7 +42,7 @@ func getAddCourseQuery() common.OpenAddCourseQuery {
 func TestMain(m *testing.M) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +54,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	err = context.ClearCourseCollection()
+	err = context.ClearCourses()
 
 	if err != nil {
 		panic(err)
@@ -71,7 +74,7 @@ func TestAddCourse(t *testing.T) {
 
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +102,7 @@ func TestGetCourse(t *testing.T) {
 
 	context := getContext()
 
-	err := context.Connect("mongodb://localhost")
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,14 +128,14 @@ func TestGetCourse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Log(courseResult.Id.String())
+	t.Log(courseResult.Id)
 }
 
 // TestGetCourses
 func TestGetCourses(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +166,7 @@ func TestGetCourses(t *testing.T) {
 func TestAddCourseAuthors(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +198,7 @@ func TestAddCourseAuthors(t *testing.T) {
 func TestRemoveCourseAuthors(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +246,7 @@ func TestRemoveCourseAuthors(t *testing.T) {
 func TestAddCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -297,7 +300,7 @@ func TestAddCourseAction(t *testing.T) {
 func TestRemoveCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -354,7 +357,7 @@ func TestRemoveCourseAction(t *testing.T) {
 func TestChangeCourseAction(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -401,7 +404,7 @@ func TestChangeCourseAction(t *testing.T) {
 func TestAddCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -434,7 +437,7 @@ func TestAddCourseComment(t *testing.T) {
 func TestReplyCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -487,7 +490,7 @@ func TestReplyCourseComment(t *testing.T) {
 func TestRemoveCourseComment(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -532,7 +535,7 @@ func TestRemoveCourseComment(t *testing.T) {
 func TestAddCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -575,7 +578,7 @@ func TestAddCourseTags(t *testing.T) {
 func TestRemoveCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(MongoDbHost)
+	err := context.Connect(ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
