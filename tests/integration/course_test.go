@@ -1,19 +1,18 @@
 package integration
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"opencourse/common"
 	"opencourse/data-providers/mongodb"
 	"testing"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const ConnectionString = "mongodb://localhost"
 
 func getContext() common.DbContext {
 
-	var context common.DbContext
-
-	context = &mongodb.ContextMongoDb{}
+	context := &mongodb.ContextMongoDb{}
 
 	// Init default values
 	context.Defaults()
