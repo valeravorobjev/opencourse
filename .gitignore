@@ -2,6 +2,8 @@
 *.ipr
 *.iws
 .idea/
+.fleet/
 /build/
 /dist/
 /out/
+.DS_Store
