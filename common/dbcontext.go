@@ -17,7 +17,7 @@ type DbContext interface {
 	ClearCourses() error
 	GetCourse(id string) (*Course, error)
 	GetCourses(take int64, skip int64) ([]*Course, error)
-	AddCourse(userId string, addCourseQuery *AddCourseQuery) (string, error)
+	AddCourse(addCourseQuery *AddCourseQuery) (string, error)
 	AddCourseAction(id string, userId string, actionType string) error
 	ChangeCourseAction(id string, userId string, actionType string) error
 	RemoveCourseAction(id string, userId string) error

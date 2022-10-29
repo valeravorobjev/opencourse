@@ -11,7 +11,7 @@ import (
 )
 
 // ClearCourses remove all data from course collection
-func (ctx *ContextMongoDb) ClearCourses() error {
+func (ctx *MgContext) ClearCourses() error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	_, err := col.DeleteMany(context.Background(), bson.D{{}})
@@ -35,7 +35,7 @@ func (ctx *ContextMongoDb) ClearCourses() error {
 GetCourse return course from db by id
 @id - course id
 */
-func (ctx *ContextMongoDb) GetCourse(id string) (*common.Course, error) {
+func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
@@ -94,7 +94,7 @@ GetCourses return courses from db
 
 TODO: Now, courses range by rating and date. Need to upgrade rage system
 */
-func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.Course, error) {
+func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	ops := options.Find().SetLimit(take).SetSkip(skip).
@@ -156,7 +156,7 @@ AddCourse add course to db
 userId - user id how create new course. He also set to course authors
 @course - entity for save to db
 */
-func (ctx *ContextMongoDb) AddCourse(addCourseQuery *common.AddCourseQuery) (string, error) {
+func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
@@ -226,7 +226,7 @@ AddCourseAction set action for course
 @userId - user id
 @actionType - type of action
 */
-func (ctx *ContextMongoDb) AddCourseAction(id string, userId string, actionType string) error {
+func (ctx *MgContext) AddCourseAction(id string, userId string, actionType string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -290,7 +290,7 @@ RemoveCourseAction remove action from course
 @id - course id
 @userId - user id
 */
-func (ctx *ContextMongoDb) RemoveCourseAction(id string, userId string) error {
+func (ctx *MgContext) RemoveCourseAction(id string, userId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -342,7 +342,7 @@ ChangeCourseAction change course action
 @userId - user id
 @actionType - type of action
 */
-func (ctx *ContextMongoDb) ChangeCourseAction(id string, userId string, actionType string) error {
+func (ctx *MgContext) ChangeCourseAction(id string, userId string, actionType string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -401,7 +401,7 @@ AddCourseComment add comment to course or for another course comment
 @userId - user id
 @text - comment's text
 */
-func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text string) (string, error) {
+func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectUserId, err := primitive.ObjectIDFromHex(userId)
@@ -466,7 +466,7 @@ ReplyCourseComment reply course comment
 @commentId - comment id
 @text - comment's text
 */
-func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentId string, text string) error {
+func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId string, text string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectUserId, err := primitive.ObjectIDFromHex(userId)
@@ -546,7 +546,7 @@ RemoveCourseComment remove comment from course
 @id - course id
 @commentId - comment id
 */
-func (ctx *ContextMongoDb) RemoveCourseComment(id string, commentId string) error {
+func (ctx *MgContext) RemoveCourseComment(id string, commentId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectCommentId, err := primitive.ObjectIDFromHex(commentId)
@@ -619,7 +619,7 @@ AddCourseTags - add tags to course
 @id - course id
 @tags - tags
 */
-func (ctx *ContextMongoDb) AddCourseTags(id string, tags []string) error {
+func (ctx *MgContext) AddCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -672,7 +672,7 @@ RemoveCourseTags - remove tags from course
 @id - course id
 @tags - tags
 */
-func (ctx *ContextMongoDb) RemoveCourseTags(id string, tags []string) error {
+func (ctx *MgContext) RemoveCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)

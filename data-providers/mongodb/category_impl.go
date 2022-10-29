@@ -11,7 +11,7 @@ import (
 )
 
 // GetCategories return all categories from db
-func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.Category, error) {
+func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	find := bson.D{
@@ -73,7 +73,7 @@ func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.Category, er
 }
 
 // AddCategory method for add new category and sub categories to database
-func (ctx *ContextMongoDb) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
+func (ctx *MgContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	category := MgCategory{}
@@ -111,7 +111,7 @@ UpdateCategory update category name
 @cid - category id
 @names - category names
 */
-func (ctx *ContextMongoDb) UpdateCategory(cid string, name string) error {
+func (ctx *MgContext) UpdateCategory(cid string, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
@@ -147,7 +147,7 @@ UpdateSubCategory update sub category names
 @scn - sub category number
 @names - sub category names
 */
-func (ctx *ContextMongoDb) UpdateSubCategory(cid string, scn int, name string) error {
+func (ctx *MgContext) UpdateSubCategory(cid string, scn int, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
@@ -186,7 +186,7 @@ AddSubCategory add sub category for category.
 @name - sub category name
 @lang - sub category language
 */
-func (ctx *ContextMongoDb) AddSubCategory(cid string, name string) error {
+func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
@@ -264,7 +264,7 @@ DeleteSubCategory delete sub category from category
 @cid - category id
 @scn - sub category number
 */
-func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
+func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)

@@ -12,7 +12,7 @@ const ConnectionString = "mongodb://localhost"
 
 func getContext() common.DbContext {
 
-	context := &mongodb.ContextMongoDb{}
+	context := &mongodb.MgContext{}
 
 	// Init default values
 	context.Defaults()
@@ -20,10 +20,10 @@ func getContext() common.DbContext {
 	return context
 }
 
-func getAddCourseQuery() common.OpenAddCourseQuery {
-	addCourseQuery := common.OpenAddCourseQuery{
+func getAddCourseQuery() common.AddCourseQuery {
+	addCourseQuery := common.AddCourseQuery{
 		Name:              "The greatest golang",
-		Lang:              common.OpenLangEn,
+		Lang:              common.LangEn,
 		CategoryId:        primitive.NewObjectID().Hex(),
 		SubCategoryNumber: 12,
 		Tags:              []string{"Go"},
@@ -81,7 +81,7 @@ func TestAddCourse(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -110,7 +110,7 @@ func TestGetCourse(t *testing.T) {
 
 	addCourseQeury := getAddCourseQuery()
 
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQeury)
+	id, err := context.AddCourse(&addCourseQeury)
 
 	if err != nil {
 		t.Fatal(err)
@@ -143,7 +143,7 @@ func TestGetCourses(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		addCourseQeury := getAddCourseQuery()
-		_, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQeury)
+		_, err := context.AddCourse(&addCourseQeury)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -173,26 +173,26 @@ func TestAddCourseAction(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	userId := primitive.NewObjectID().Hex()
-	err = context.AddCourseAction(id, userId, common.OpenActionLike)
+	err = context.AddCourseAction(id, userId, common.ActionLike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseAction(id, userId, common.OpenActionDislike)
+	err = context.AddCourseAction(id, userId, common.ActionDislike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.AddCourseAction(id, userId, common.OpenActionLike)
+	err = context.AddCourseAction(id, userId, common.ActionLike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -227,14 +227,14 @@ func TestRemoveCourseAction(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	userId := primitive.NewObjectID().Hex()
-	err = context.AddCourseAction(id, userId, common.OpenActionLike)
+	err = context.AddCourseAction(id, userId, common.ActionLike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -284,20 +284,20 @@ func TestChangeCourseAction(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	userId := primitive.NewObjectID().Hex()
-	err = context.AddCourseAction(id, userId, common.OpenActionLike)
+	err = context.AddCourseAction(id, userId, common.ActionLike)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = context.ChangeCourseAction(id, userId, common.OpenActionDislike)
+	err = context.ChangeCourseAction(id, userId, common.ActionDislike)
 
 	if err != nil {
 		t.Fatal(err)
@@ -309,7 +309,7 @@ func TestChangeCourseAction(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(courseResult.Actions) != 1 || courseResult.Actions[0].ActionType != common.OpenActionDislike {
+	if len(courseResult.Actions) != 1 || courseResult.Actions[0].ActionType != common.ActionDislike {
 		t.Error("Course must = 1 and ActionType = ActionDislike")
 	}
 }
@@ -331,7 +331,7 @@ func TestAddCourseComment(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -364,7 +364,7 @@ func TestReplyCourseComment(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -417,7 +417,7 @@ func TestRemoveCourseComment(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -462,7 +462,7 @@ func TestAddCourseTags(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
@@ -505,7 +505,7 @@ func TestRemoveCourseTags(t *testing.T) {
 	}()
 
 	addCourseQuery := getAddCourseQuery()
-	id, err := context.AddCourse(primitive.NewObjectID().Hex(), &addCourseQuery)
+	id, err := context.AddCourse(&addCourseQuery)
 
 	if err != nil {
 		t.Fatal(err)
