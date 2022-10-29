@@ -51,7 +51,7 @@ func (mgComment *MgComment) ToComment() (*common.Comment, error) {
 	comment.Id = mgComment.Id.Hex()
 	comment.UserId = mgComment.UserId.Hex()
 	comment.Text = mgComment.Text
-	if primitive.ObjectID.IsZero(mgComment.ParentId) != false {
+	if primitive.ObjectID.IsZero(mgComment.ParentId) == false {
 		comment.ParentId = mgComment.ParentId.Hex()
 	}
 
@@ -123,7 +123,7 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 
 	}
 
-	if course.Actions != nil {
+	if mgCourse.Actions != nil {
 		course.Actions = []*common.Action{}
 
 		for _, mgAction := range mgCourse.Actions {
