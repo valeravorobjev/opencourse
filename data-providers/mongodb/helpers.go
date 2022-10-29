@@ -12,204 +12,205 @@ This file contains methods for mapping common (Open) models to MongoDB models
 */
 
 /*
-ToOpenAction map Action to OpenAction
+ToAction map MgAction to Action
 */
-func (action *Action) ToOpenAction() (*common.OpenAction, error) {
-	if action == nil {
+func (mgAction *MgAction) ToAction() (*common.Action, error) {
+	if mgAction == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/helpers.go",
-				Method: "ToOpenAction",
+				Method: "ToAction",
 			},
-			Model: "action",
+			Model: "mgAction",
 		}
 	}
 
-	var openAction common.OpenAction
-	openAction.ActionType = action.ActionType
-	openAction.UserId = action.UserId.Hex()
+	var action common.Action
+	action.ActionType = mgAction.ActionType
+	action.UserId = mgAction.UserId.Hex()
 
-	return &openAction, nil
+	return &action, nil
 }
 
 /*
-ToOpenComment map Comment to OpenComment
+ToComment map MgComment to Comment
 */
-func (comment *Comment) ToOpenComment() (*common.OpenComment, error) {
-	if comment == nil {
+func (mgComment *MgComment) ToComment() (*common.Comment, error) {
+	if mgComment == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/helpers.go",
-				Method: "ToOpenComment",
+				Method: "ToComment",
 			},
-			Model: "comment",
+			Model: "mgComment",
 		}
 	}
 
-	var openComment common.OpenComment
-	openComment.Id = comment.Id.Hex()
-	openComment.UserId = comment.UserId.Hex()
-	openComment.Text = comment.Text
-	if primitive.ObjectID.IsZero(comment.ParentId) != false {
-		openComment.ParentId = comment.ParentId.Hex()
+	var comment common.Comment
+
+	comment.Id = mgComment.Id.Hex()
+	comment.UserId = mgComment.UserId.Hex()
+	comment.Text = mgComment.Text
+	if primitive.ObjectID.IsZero(mgComment.ParentId) != false {
+		comment.ParentId = mgComment.ParentId.Hex()
 	}
 
-	if comment.Actions != nil {
-		openComment.Actions = []*common.OpenAction{}
+	if mgComment.Actions != nil {
+		comment.Actions = []*common.Action{}
 
-		for _, action := range comment.Actions {
-			openAction, err := action.ToOpenAction()
+		for _, mgAction := range mgComment.Actions {
+			action, err := mgAction.ToAction()
 
 			if err == nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
 						File:   "data-providers/mongodb/helpers.go",
-						Method: "ToOpenComment",
+						Method: "ToComment",
 					},
-					Msg: "can't convert Action to OpenAction",
+					Msg: "can't convert MgAction to Action",
 				}
 			}
 
-			openComment.Actions = append(openComment.Actions, openAction)
+			comment.Actions = append(comment.Actions, action)
 		}
 	}
 
-	return &openComment, nil
+	return &comment, nil
 }
 
 /*
-ToOpenCourse map Course to OpenCourse
+ToCourse map MgCourse to Course
 */
-func (course *Course) ToOpenCourse() (*common.OpenCourse, error) {
-	if course == nil {
+func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
+	if mgCourse == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/helpers.go",
-				Method: "ToOpenCourse",
+				Method: "ToCourse",
 			},
-			Model: "course",
+			Model: "mgCourse",
 		}
 	}
 
-	var openCourse common.OpenCourse
+	var course common.Course
 
-	openCourse.Id = course.Id.Hex()
-	openCourse.CategoryId = course.CategoryId.Hex()
-	openCourse.SubCategoryNumber = course.SubCategoryNumber
-	openCourse.Name = course.Name
-	openCourse.Lang = course.Lang
-	openCourse.Tags = course.Tags
+	course.Id = mgCourse.Id.Hex()
+	course.CategoryId = mgCourse.CategoryId.Hex()
+	course.SubCategoryNumber = mgCourse.SubCategoryNumber
+	course.Name = mgCourse.Name
+	course.Lang = mgCourse.Lang
+	course.Tags = mgCourse.Tags
 
-	if course.Comments != nil {
-		openCourse.Comments = []*common.OpenComment{}
+	if mgCourse.Comments != nil {
+		course.Comments = []*common.Comment{}
 
-		for _, comment := range course.Comments {
+		for _, mgComment := range mgCourse.Comments {
 
-			openComment, err := comment.ToOpenComment()
+			comment, err := mgComment.ToComment()
 
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
 						File:   "data-providers/mongodb/helpers.go",
-						Method: "ToOpenCourse",
+						Method: "ToCourse",
 					},
 					Msg: err.Error(),
 				}
 			}
 
-			openCourse.Comments = append(openCourse.Comments, openComment)
+			course.Comments = append(course.Comments, comment)
 		}
 
 	}
 
 	if course.Actions != nil {
-		openCourse.Actions = []*common.OpenAction{}
+		course.Actions = []*common.Action{}
 
-		for _, action := range course.Actions {
+		for _, mgAction := range mgCourse.Actions {
 
-			openAction, err := action.ToOpenAction()
+			action, err := mgAction.ToAction()
 
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
 						File:   "data-providers/mongodb/helpers.go",
-						Method: "ToOpenCourse",
+						Method: "ToCourse",
 					},
 					Msg: err.Error(),
 				}
 			}
 
-			openCourse.Actions = append(openCourse.Actions, openAction)
+			course.Actions = append(course.Actions, action)
 		}
 	}
 
-	openCourse.HeaderImg = course.HeaderImg
+	course.HeaderImg = mgCourse.HeaderImg
 
-	openCourse.Rating = course.Rating
-	openCourse.DateCreate = time.Unix(int64(course.DateCreate.T), 0)
-	openCourse.DateUpdate = time.Unix(int64(course.DateUpdate.T), 0)
+	course.Rating = mgCourse.Rating
+	course.DateCreate = time.Unix(int64(mgCourse.DateCreate.T), 0)
+	course.DateUpdate = time.Unix(int64(mgCourse.DateUpdate.T), 0)
 
-	return &openCourse, nil
+	return &course, nil
 }
 
 /*
-ToOpenCategory map Category to OpenCategory
+ToCategory map MgCategory to Category
 */
-func (category *Category) ToOpenCategory() (*common.OpenCategory, error) {
-	if category == nil {
+func (mgCategory *MgCategory) ToCategory() (*common.Category, error) {
+	if mgCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/helpers.go",
-				Method: "ToOpenCategory",
+				Method: "ToCategory",
 			},
-			Model: "category",
+			Model: "mgCategory",
 		}
 	}
 
-	var openCategory common.OpenCategory
+	var category common.Category
 
-	openCategory.Id = category.Id.Hex()
-	openCategory.Name = category.Name
-	openCategory.Lang = category.Lang
+	category.Id = mgCategory.Id.Hex()
+	category.Name = mgCategory.Name
+	category.Lang = mgCategory.Lang
 
-	for _, subCategory := range category.SubCategories {
+	for _, mgSubCategory := range mgCategory.SubCategories {
 
-		openSubCategory, err := subCategory.ToOpenSubCategory()
+		subCategory, err := mgSubCategory.ToSubCategory()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
 					File:   "data-providers/mongodb/helpers.go",
-					Method: "ToOpenCategory",
+					Method: "ToCategory",
 				},
 				Msg: err.Error(),
 			}
 		}
 
-		openCategory.SubCategories = append(openCategory.SubCategories, openSubCategory)
+		category.SubCategories = append(category.SubCategories, subCategory)
 	}
 
-	return &openCategory, nil
+	return &category, nil
 }
 
 /*
-ToOpenSubCategory map SubCategory to OpenSubCategory
+ToSubCategory map MgSubCategory to SubCategory
 */
-func (subCategory *SubCategory) ToOpenSubCategory() (*common.OpenSubCategory, error) {
-	if subCategory == nil {
+func (mgSubCategory *MgSubCategory) ToSubCategory() (*common.SubCategory, error) {
+	if mgSubCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "data-providers/mongodb/helpers.go",
-				Method: "ToOpenSubCategory",
+				Method: "ToSubCategory",
 			},
-			Model: "subCategory",
+			Model: "mgSubCategory",
 		}
 	}
 
-	var openSubCategory common.OpenSubCategory
-	openSubCategory.Number = subCategory.Number
-	openSubCategory.Name = subCategory.Name
+	var subCategory common.SubCategory
+	subCategory.Number = mgSubCategory.Number
+	subCategory.Name = mgSubCategory.Name
 
-	return &openSubCategory, nil
+	return &subCategory, nil
 
 }

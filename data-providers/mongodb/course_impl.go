@@ -35,7 +35,7 @@ func (ctx *ContextMongoDb) ClearCourses() error {
 GetCourse return course from db by id
 @id - course id
 */
-func (ctx *ContextMongoDb) GetCourse(id string) (*common.OpenCourse, error) {
+func (ctx *ContextMongoDb) GetCourse(id string) (*common.Course, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
@@ -57,8 +57,8 @@ func (ctx *ContextMongoDb) GetCourse(id string) (*common.OpenCourse, error) {
 		{"_id", objectId},
 	}
 
-	var course Course
-	err = col.FindOne(context.Background(), filter).Decode(&course)
+	var mgCourse MgCourse
+	err = col.FindOne(context.Background(), filter).Decode(&mgCourse)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
@@ -72,7 +72,7 @@ func (ctx *ContextMongoDb) GetCourse(id string) (*common.OpenCourse, error) {
 		}
 	}
 
-	openCourse, err := course.ToOpenCourse()
+	course, err := mgCourse.ToCourse()
 
 	if err != nil {
 		return nil, openerrors.OpenDefaultErr{
@@ -84,7 +84,7 @@ func (ctx *ContextMongoDb) GetCourse(id string) (*common.OpenCourse, error) {
 		}
 	}
 
-	return openCourse, nil
+	return course, nil
 }
 
 /*
@@ -94,7 +94,7 @@ GetCourses return courses from db
 
 TODO: Now, courses range by rating and date. Need to upgrade rage system
 */
-func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.OpenCourse, error) {
+func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.Course, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	ops := options.Find().SetLimit(take).SetSkip(skip).
@@ -114,9 +114,9 @@ func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.OpenCou
 		}
 	}
 
-	var courses []*Course
+	var mgCourses []*MgCourse
 
-	err = cursor.All(context.Background(), &courses)
+	err = cursor.All(context.Background(), &mgCourses)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
@@ -130,10 +130,10 @@ func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.OpenCou
 		}
 	}
 
-	var openCourses []*common.OpenCourse
+	var courses []*common.Course
 
-	for _, course := range courses {
-		openCourse, err := course.ToOpenCourse()
+	for _, mgCourse := range mgCourses {
+		course, err := mgCourse.ToCourse()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
@@ -145,10 +145,10 @@ func (ctx *ContextMongoDb) GetCourses(take int64, skip int64) ([]*common.OpenCou
 			}
 		}
 
-		openCourses = append(openCourses, openCourse)
+		courses = append(courses, course)
 	}
 
-	return openCourses, nil
+	return courses, nil
 }
 
 /*
@@ -156,32 +156,15 @@ AddCourse add course to db
 userId - user id how create new course. He also set to course authors
 @course - entity for save to db
 */
-func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenAddCourseQuery) (string, error) {
+func (ctx *ContextMongoDb) AddCourse(addCourseQuery *common.AddCourseQuery) (string, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	var course Course
-	course.Name = addCourseQuery.Name
-	course.Lang = addCourseQuery.Lang
+	var mgCourse MgCourse
+	mgCourse.Name = addCourseQuery.Name
+	mgCourse.Lang = addCourseQuery.Lang
 
-	categoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
-
-	if err != nil {
-		return "", openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
-				Method: "AddCourse",
-			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
-		}
-	}
-
-	course.CategoryId = categoryId
-	course.SubCategoryNumber = addCourseQuery.SubCategoryNumber
-	course.HeaderImg = addCourseQuery.HeaderImg
-	course.Tags = addCourseQuery.Tags
+	objectCategoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
@@ -194,14 +177,31 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 			DbErr:  err.Error(),
 		}
 	}
-	course.Rating = 0
+
+	mgCourse.CategoryId = objectCategoryId
+	mgCourse.SubCategoryNumber = addCourseQuery.SubCategoryNumber
+	mgCourse.HeaderImg = addCourseQuery.HeaderImg
+	mgCourse.Tags = addCourseQuery.Tags
+
+	if err != nil {
+		return "", openerrors.OpenDbErr{
+			BaseErr: openerrors.OpenBaseErr{
+				File:   "data-providers/mongodb/course_impl.go",
+				Method: "AddCourse",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+	mgCourse.Rating = 0
 
 	nowUtcTime := time.Now().Unix()
 
-	course.DateCreate = primitive.Timestamp{T: uint32(nowUtcTime)}
-	course.DateUpdate = primitive.Timestamp{T: uint32(nowUtcTime)}
+	mgCourse.DateCreate = primitive.Timestamp{T: uint32(nowUtcTime)}
+	mgCourse.DateUpdate = primitive.Timestamp{T: uint32(nowUtcTime)}
 
-	result, err := col.InsertOne(context.Background(), course)
+	result, err := col.InsertOne(context.Background(), mgCourse)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
@@ -216,7 +216,6 @@ func (ctx *ContextMongoDb) AddCourse(userId string, addCourseQuery *common.OpenA
 	}
 
 	id := result.InsertedID.(primitive.ObjectID)
-	course.Id = id
 
 	return id.Hex(), err
 }
@@ -258,10 +257,12 @@ func (ctx *ContextMongoDb) AddCourseAction(id string, userId string, actionType 
 		}
 	}
 
-	action := Action{UserId: objectUserId, ActionType: actionType}
+	action := MgAction{UserId: objectUserId, ActionType: actionType}
 
-	filter := bson.D{{"_id", objectId},
-		{"actions.user_id", bson.D{{"$ne", objectUserId}}}}
+	filter := bson.D{
+		{"_id", objectId},
+		{"actions.user_id", bson.D{{"$ne", objectUserId}}},
+	}
 
 	update := bson.D{
 		{"$push", bson.D{{"actions", action}}},
@@ -431,14 +432,14 @@ func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text strin
 		}
 	}
 
-	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
+	mgComment := &MgComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
 
 	find := bson.D{
 		{"_id", objectId},
 	}
 
 	update := bson.D{
-		{"$push", bson.D{{"comments", comment}}},
+		{"$push", bson.D{{"comments", mgComment}}},
 	}
 
 	_, err = col.UpdateOne(context.Background(), find, update)
@@ -455,7 +456,7 @@ func (ctx *ContextMongoDb) AddCourseComment(id string, userId string, text strin
 		}
 	}
 
-	return comment.Id.Hex(), nil
+	return mgComment.Id.Hex(), nil
 }
 
 /*
@@ -510,7 +511,7 @@ func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentI
 		}
 	}
 
-	comment := &Comment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, ParentId: objectCommentId}
+	mgComment := &MgComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, ParentId: objectCommentId}
 
 	find := bson.D{
 		{"_id", objectId},
@@ -519,7 +520,7 @@ func (ctx *ContextMongoDb) ReplyCourseComment(id string, userId string, commentI
 
 	update := bson.D{
 		{"$push", bson.D{
-			{"comments", comment},
+			{"comments", mgComment},
 		}},
 	}
 

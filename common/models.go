@@ -8,28 +8,28 @@ import (
 
 // Languages types
 const (
-	OpenLangEn = "en" // English
-	OpenLangFr = "fr" // France
-	OpenLangDe = "de" // Germany
-	OpenLangIt = "it" // Italian
-	OpenLangRu = "ru" // Russian
+	LangEn = "en" // English
+	LangFr = "fr" // France
+	LangDe = "de" // Germany
+	LangIt = "it" // Italian
+	LangRu = "ru" // Russian
 )
 
 // Action types
 const (
-	OpenActionLike    = "Like"    // Like
-	OpenActionDislike = "Dislike" // Dislike
+	ActionLike    = "Like"    // Like
+	ActionDislike = "Dislike" // Dislike
 )
 
 // User roles
 const (
-	OpenRoleUser   = "User"          // Simple user role
-	OpenRoleAuthor = "Author"        // Is an author of courses
-	OpenRoleAdmin  = "Administrator" // Privileged user role
+	RoleUser   = "User"          // Simple user role
+	RoleAuthor = "Author"        // Is an author of courses
+	RoleAdmin  = "Administrator" // Privileged user role
 )
 
-// OpenUser user common model
-type OpenUser struct {
+// User user common model
+type User struct {
 	Id     string   `json:"id"`     // User id
 	Login  string   `json:"login"`  // User login
 	Name   string   `json:"name"`   // User display name
@@ -39,8 +39,8 @@ type OpenUser struct {
 	Roles  []string `json:"roles"`  // User roles
 }
 
-// OpenAddUserQuery model for create user
-type OpenAddUserQuery struct {
+// AddUserQuery model for create user
+type AddUserQuery struct {
 	Login    string   `json:"login"`    // User login
 	Password string   `json:"password"` // User password
 	Email    string   `json:"email"`    // Email user address
@@ -49,69 +49,69 @@ type OpenAddUserQuery struct {
 	Roles    []string `json:"roles"`    // User roles
 }
 
-// OpenSubCategory sub category
-type OpenSubCategory struct {
+// SubCategory sub category
+type SubCategory struct {
 	Number int    `json:"number"`
 	Name   string `json:"name"`
 }
 
-// OpenCategory category for course
-type OpenCategory struct {
-	Id            string             `json:"id"`
-	Lang          string             `json:"lang"` // Support language
-	Name          string             `json:"name"`
-	SubCategories []*OpenSubCategory `json:"sub_categories"`
+// Category for course
+type Category struct {
+	Id            string         `json:"id"`
+	Lang          string         `json:"lang"` // Support language
+	Name          string         `json:"name"`
+	SubCategories []*SubCategory `json:"sub_categories"`
 }
 
-// OpenAddCategoryQuery model for create category
-type OpenAddCategoryQuery struct {
-	Lang          string             `json:"lang"` // Support language
-	Name          string             `json:"name"`
-	SubCategories []*OpenSubCategory `json:"sub_categories"`
+// AddCategoryQuery model for create category
+type AddCategoryQuery struct {
+	Lang          string         `json:"lang"` // Support language
+	Name          string         `json:"name"`
+	SubCategories []*SubCategory `json:"sub_categories"`
 }
 
-// OpenUpdateCategoryQuery model for update category
-type OpenUpdateCategoryQuery struct {
-	CategoryId    string             `json:"category_id"`
-	Langs         []string           `json:"lang"` // Support language
-	Name          string             `json:"name"`
-	SubCategories []*OpenSubCategory `json:"sub_categories"`
+// UpdateCategoryQuery model for update category
+type UpdateCategoryQuery struct {
+	CategoryId    string         `json:"category_id"`
+	Langs         []string       `json:"lang"` // Support language
+	Name          string         `json:"name"`
+	SubCategories []*SubCategory `json:"sub_categories"`
 }
 
-// OpenCourse model
-type OpenCourse struct {
-	Id                string         `json:"id"`                  // Course id
-	AuthorIds         []string       `json:"author_ids"`          // Course authors ids
-	Lang              string         `json:"lang"`                // Support language
-	Name              string         `json:"name"`                // Course name
-	CategoryId        string         `json:"category_id"`         // Course category
-	SubCategoryNumber int            `json:"sub_category_number"` // Course sub category
-	Tags              []string       `json:"tags"`                // Course tags
-	HeaderImg         string         `json:"header_img"`          // Course header image
-	DateCreate        time.Time      `json:"date_create"`         // Create date of course
-	DateUpdate        time.Time      `json:"date_update"`         // Update date of course
-	Rating            int            `json:"rating"`              // Course rating
-	Actions           []*OpenAction  `json:"actions"`             // Actions for comments
-	Comments          []*OpenComment `json:"comments"`            // Comments for this post
+// Course model
+type Course struct {
+	Id                string     `json:"id"`                  // Course id
+	AuthorIds         []string   `json:"author_ids"`          // Course authors ids
+	Lang              string     `json:"lang"`                // Support language
+	Name              string     `json:"name"`                // Course name
+	CategoryId        string     `json:"category_id"`         // Course category
+	SubCategoryNumber int        `json:"sub_category_number"` // Course sub category
+	Tags              []string   `json:"tags"`                // Course tags
+	HeaderImg         string     `json:"header_img"`          // Course header image
+	DateCreate        time.Time  `json:"date_create"`         // Create date of course
+	DateUpdate        time.Time  `json:"date_update"`         // Update date of course
+	Rating            int        `json:"rating"`              // Course rating
+	Actions           []*Action  `json:"actions"`             // Actions for comments
+	Comments          []*Comment `json:"comments"`            // Comments for this post
 }
 
-// OpenComment user comment
-type OpenComment struct {
-	Id       string        `json:"id"`        // Comment id
-	UserId   string        `json:"user_id"`   // User id
-	Text     string        `json:"text"`      // Comment text
-	Actions  []*OpenAction `json:"actions"`   // Actions for comment
-	ParentId string        `json:"parent_id"` // ParentId parent's comment id
+// Comment user comment
+type Comment struct {
+	Id       string    `json:"id"`        // Comment id
+	UserId   string    `json:"user_id"`   // User id
+	Text     string    `json:"text"`      // Comment text
+	Actions  []*Action `json:"actions"`   // Actions for comment
+	ParentId string    `json:"parent_id"` // ParentId parent's comment id
 }
 
-// OpenAction user action
-type OpenAction struct {
+// Action user action
+type Action struct {
 	UserId     string `json:"user_id"`
 	ActionType string `json:"action_type"`
 }
 
-// OpenAddCourseQuery add course query
-type OpenAddCourseQuery struct {
+// AddCourseQuery add course query
+type AddCourseQuery struct {
 	Lang              string   `json:"lang"`                // Support languages
 	Name              string   `json:"name"`                // Course name
 	CategoryId        string   `json:"category_id"`         // Course category

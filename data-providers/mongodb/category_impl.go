@@ -11,7 +11,7 @@ import (
 )
 
 // GetCategories return all categories from db
-func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory, error) {
+func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.Category, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	find := bson.D{
@@ -36,9 +36,9 @@ func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory
 		}
 	}
 
-	var categories []*Category
+	var mgCategories []*MgCategory
 
-	err = cursor.Decode(categories)
+	err = cursor.Decode(mgCategories)
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
@@ -51,10 +51,10 @@ func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory
 		}
 	}
 
-	var openCategories []*common.OpenCategory
+	var categories []*common.Category
 
-	for _, category := range categories {
-		openCategory, err := category.ToOpenCategory()
+	for _, mgCategory := range mgCategories {
+		category, err := mgCategory.ToCategory()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
@@ -66,24 +66,24 @@ func (ctx *ContextMongoDb) GetCategories(langs []string) ([]*common.OpenCategory
 			}
 		}
 
-		openCategories = append(openCategories, openCategory)
+		categories = append(categories, category)
 	}
 
-	return openCategories, nil
+	return categories, nil
 }
 
 // AddCategory method for add new category and sub categories to database
-func (ctx *ContextMongoDb) AddCategory(addCategoryQuery *common.OpenAddCategoryQuery) (string, error) {
+func (ctx *ContextMongoDb) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
-	category := Category{}
+	category := MgCategory{}
 
 	category.Name = addCategoryQuery.Name
 	category.Lang = addCategoryQuery.Lang
 
 	for _, openSubCategory := range addCategoryQuery.SubCategories {
 
-		subCategory := &SubCategory{Number: openSubCategory.Number, Name: openSubCategory.Name}
+		subCategory := &MgSubCategory{Number: openSubCategory.Number, Name: openSubCategory.Name}
 		category.SubCategories = append(category.SubCategories, subCategory)
 	}
 
@@ -209,7 +209,7 @@ func (ctx *ContextMongoDb) AddSubCategory(cid string, name string) error {
 		{"_id", categoryId},
 	}
 
-	var category Category
+	var category MgCategory
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
@@ -224,15 +224,15 @@ func (ctx *ContextMongoDb) AddSubCategory(cid string, name string) error {
 		}
 	}
 
-	var subCategory *SubCategory
+	var subCategory *MgSubCategory
 
 	if len(category.SubCategories) == 0 {
-		subCategory = &SubCategory{Number: 0, Name: name}
+		subCategory = &MgSubCategory{Number: 0, Name: name}
 	} else {
 		lastSubCategory := category.SubCategories[len(category.SubCategories)-1]
 
 		subCategory =
-			&SubCategory{Number: lastSubCategory.Number + 1, Name: name}
+			&MgSubCategory{Number: lastSubCategory.Number + 1, Name: name}
 	}
 
 	update := bson.D{
@@ -287,7 +287,7 @@ func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
 		{"_id", categoryId},
 	}
 
-	var category Category
+	var category MgCategory
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
@@ -306,7 +306,7 @@ func (ctx *ContextMongoDb) DeleteSubCategory(cid string, scn int) error {
 		return nil
 	}
 
-	var subCategories []*SubCategory
+	var subCategories []*MgSubCategory
 	number := 0
 	for _, item := range category.SubCategories {
 		if item.Number == scn {

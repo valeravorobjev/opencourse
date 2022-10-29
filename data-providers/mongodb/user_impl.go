@@ -16,7 +16,7 @@ import (
 AddUser create user and save his to database
 @createUserQuery - create user model
 */
-func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (string, error) {
+func (ctx *ContextMongoDb) AddUser(createUserQuery *common.AddUserQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(UserCollection)
 
 	// Validate create user model
@@ -74,7 +74,7 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (st
 
 	for _, role := range createUserQuery.Roles {
 		switch role {
-		case common.OpenRoleUser, common.OpenRoleAuthor, common.OpenRoleAdmin:
+		case common.RoleUser, common.RoleAuthor, common.RoleAdmin:
 			continue
 		default:
 			return "", openerrors.OpenRoleUnknownErr{
@@ -83,19 +83,19 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (st
 					Method: "AddUser",
 				},
 				Role:  role,
-				Roles: []string{common.OpenRoleUser, common.OpenRoleAuthor, common.OpenRoleAdmin},
+				Roles: []string{common.RoleUser, common.RoleAuthor, common.RoleAdmin},
 			}
 		}
 	}
 
 	// Create new user
 
-	var user User
+	var mgUser MgUser
 
-	user.Name = createUserQuery.Name
-	user.Avatar = createUserQuery.Avatar
-	user.Email = createUserQuery.Email
-	user.Rating = 0
+	mgUser.Name = createUserQuery.Name
+	mgUser.Avatar = createUserQuery.Avatar
+	mgUser.Email = createUserQuery.Email
+	mgUser.Rating = 0
 
 	rand.Seed(time.Now().UnixNano())
 	minRand := 10000000
@@ -109,7 +109,7 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (st
 
 	timeNow := primitive.Timestamp{T: uint32(time.Now().Unix())}
 
-	user.Credential = &Credential{
+	mgUser.Credential = &MgCredential{
 		Login:            createUserQuery.Login,
 		Password:         hash,
 		Salt:             salt,
@@ -121,7 +121,7 @@ func (ctx *ContextMongoDb) AddUser(createUserQuery *common.OpenAddUserQuery) (st
 
 	// Save user to DB
 
-	result, err := col.InsertOne(context.Background(), user)
+	result, err := col.InsertOne(context.Background(), mgUser)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
