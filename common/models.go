@@ -80,19 +80,19 @@ type UpdateCategoryQuery struct {
 
 // Course model
 type Course struct {
-	Id                string     `json:"id"`                  // Course id
-	AuthorIds         []string   `json:"author_ids"`          // Course authors ids
-	Lang              string     `json:"lang"`                // Support language
-	Name              string     `json:"name"`                // Course name
-	CategoryId        string     `json:"category_id"`         // Course category
-	SubCategoryNumber int        `json:"sub_category_number"` // Course sub category
-	Tags              []string   `json:"tags"`                // Course tags
-	HeaderImg         string     `json:"header_img"`          // Course header image
-	DateCreate        time.Time  `json:"date_create"`         // Create date of course
-	DateUpdate        time.Time  `json:"date_update"`         // Update date of course
-	Rating            int        `json:"rating"`              // Course rating
-	Actions           []*Action  `json:"actions"`             // Actions for comments
-	Comments          []*Comment `json:"comments"`            // Comments for this post
+	Id                string     `json:"id"`                    // Course id
+	Lang              string     `json:"lang"`                  // Support language
+	Name              string     `json:"name"`                  // Course name
+	CategoryId        string     `json:"category_id"`           // Course category
+	SubCategoryNumber int        `json:"sub_category_number"`   // Course sub category
+	Tags              []string   `json:"tags"`                  // Course tags
+	HeaderImg         string     `json:"header_img"`            // Course header image
+	DateCreate        time.Time  `json:"date_create"`           // Create date of course
+	DateUpdate        time.Time  `json:"date_update"`           // Update date of course
+	Rating            int        `json:"rating"`                // Course rating
+	Description       string     `json:"description,omitempty"` // Course description
+	Actions           []*Action  `json:"actions,omitempty"`     // Actions for comments
+	Comments          []*Comment `json:"comments,omitempty"`    // Comments for this post
 }
 
 // Comment user comment

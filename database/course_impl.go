@@ -1,4 +1,4 @@
-package mongodb
+package database
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func (ctx *MgContext) ClearCourses() error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ClearCourseCollection",
 			},
 			DbName: ctx.DbName,
@@ -44,7 +44,7 @@ func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
@@ -63,7 +63,7 @@ func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
@@ -77,7 +77,7 @@ func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 	if err != nil {
 		return nil, openerrors.OpenDefaultErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "GetCourse",
 			},
 			Msg: err.Error(),
@@ -105,7 +105,7 @@ func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
@@ -121,7 +121,7 @@ func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
@@ -138,7 +138,7 @@ func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/course_impl.go",
+					File:   "database/mongodb/course_impl.go",
 					Method: "GetCourses",
 				},
 				Msg: err.Error(),
@@ -169,7 +169,7 @@ func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
@@ -186,7 +186,7 @@ func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
@@ -196,17 +196,17 @@ func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 	}
 	mgCourse.Rating = 0
 
-	nowUtcTime := time.Now().Unix()
+	nowUtcTime := time.Now().UTC()
 
-	mgCourse.DateCreate = primitive.Timestamp{T: uint32(nowUtcTime)}
-	mgCourse.DateUpdate = primitive.Timestamp{T: uint32(nowUtcTime)}
+	mgCourse.DateCreate = primitive.NewDateTimeFromTime(nowUtcTime)
+	mgCourse.DateUpdate = primitive.NewDateTimeFromTime(nowUtcTime)
 
 	result, err := col.InsertOne(context.Background(), mgCourse)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
@@ -234,7 +234,7 @@ func (ctx *MgContext) AddCourseAction(id string, userId string, actionType strin
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -248,7 +248,7 @@ func (ctx *MgContext) AddCourseAction(id string, userId string, actionType strin
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -273,7 +273,7 @@ func (ctx *MgContext) AddCourseAction(id string, userId string, actionType strin
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -298,7 +298,7 @@ func (ctx *MgContext) RemoveCourseAction(id string, userId string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "RemoveCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -324,7 +324,7 @@ func (ctx *MgContext) RemoveCourseAction(id string, userId string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "RemoveCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -350,7 +350,7 @@ func (ctx *MgContext) ChangeCourseAction(id string, userId string, actionType st
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ChangeCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -364,7 +364,7 @@ func (ctx *MgContext) ChangeCourseAction(id string, userId string, actionType st
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ChangeCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -382,7 +382,7 @@ func (ctx *MgContext) ChangeCourseAction(id string, userId string, actionType st
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ChangeCourseAction",
 			},
 			DbName: ctx.DbName,
@@ -409,7 +409,7 @@ func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (s
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -423,7 +423,7 @@ func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (s
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -447,7 +447,7 @@ func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (s
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -474,7 +474,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ReplyCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -488,7 +488,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ReplyCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -502,7 +502,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ReplyCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -529,7 +529,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "ReplyCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -554,7 +554,7 @@ func (ctx *MgContext) RemoveCourseComment(id string, commentId string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "RemoveCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -568,7 +568,7 @@ func (ctx *MgContext) RemoveCourseComment(id string, commentId string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "RemoveCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -602,7 +602,7 @@ func (ctx *MgContext) RemoveCourseComment(id string, commentId string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "RemoveCourseComment",
 			},
 			DbName: ctx.DbName,
@@ -627,7 +627,7 @@ func (ctx *MgContext) AddCourseTags(id string, tags []string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -655,7 +655,7 @@ func (ctx *MgContext) AddCourseTags(id string, tags []string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -680,7 +680,7 @@ func (ctx *MgContext) RemoveCourseTags(id string, tags []string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -706,7 +706,7 @@ func (ctx *MgContext) RemoveCourseTags(id string, tags []string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/course_impl.go",
+				File:   "database/mongodb/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,

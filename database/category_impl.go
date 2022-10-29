@@ -1,4 +1,4 @@
-package mongodb
+package database
 
 import (
 	"context"
@@ -27,7 +27,7 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
@@ -42,7 +42,7 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
@@ -59,7 +59,7 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/category_impl.go",
+					File:   "database/mongodb/category_impl.go",
 					Method: "GetCategories",
 				},
 				Msg: err.Error(),
@@ -92,7 +92,7 @@ func (ctx *MgContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "AddCategory",
 			},
 			DbName: ctx.DbName,
@@ -129,7 +129,7 @@ func (ctx *MgContext) UpdateCategory(cid string, name string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "UpdateCategory",
 			},
 			DbName: ctx.DbName,
@@ -168,7 +168,7 @@ func (ctx *MgContext) UpdateSubCategory(cid string, scn int, name string) error 
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "UpdateSubCategory",
 			},
 			DbName: ctx.DbName,
@@ -195,7 +195,7 @@ func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 		return openerrors.OpenInvalidIdErr{
 			Default: openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/category_impl.go",
+					File:   "database/mongodb/category_impl.go",
 					Method: "AddSubCategory",
 				},
 				Msg: fmt.Sprintf("can't convert cid %s to ObjectID with method primitive.ObjectIDFromHex(cid)", cid),
@@ -215,7 +215,7 @@ func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 	if err != nil && err != mongo.ErrNoDocuments {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "AddSubCategory",
 			},
 			DbName: ctx.DbName,
@@ -246,7 +246,7 @@ func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "AddSubCategory",
 			},
 			DbName: ctx.DbName,
@@ -273,7 +273,7 @@ func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 		return openerrors.OpenInvalidIdErr{
 			Default: openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/category_impl.go",
+					File:   "database/mongodb/category_impl.go",
 					Method: "DeleteSubCategory",
 				},
 				Msg: fmt.Sprintf("can't convert cid %s to ObjectID with method primitive.ObjectIDFromHex(cid)", cid),
@@ -293,7 +293,7 @@ func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 	if err != nil && err != mongo.ErrNoDocuments {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "DeleteSubCategory",
 			},
 			DbName: ctx.DbName,
@@ -328,7 +328,7 @@ func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/category_impl.go",
+				File:   "database/mongodb/category_impl.go",
 				Method: "DeleteSubCategory",
 			},
 			DbName: ctx.DbName,

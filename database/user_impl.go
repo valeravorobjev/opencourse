@@ -1,4 +1,4 @@
-package mongodb
+package database
 
 import (
 	"context"
@@ -24,7 +24,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if len(createUserQuery.Login) == 0 {
 		return "", openerrors.OpenFieldEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			Field: "createUserQuery.Login",
@@ -34,7 +34,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if len(createUserQuery.Password) == 0 {
 		return "", openerrors.OpenFieldEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			Field: "createUserQuery.Password",
@@ -44,7 +44,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if len(createUserQuery.Password) < 5 {
 		return "", openerrors.OpenMinLenErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			Field:  "createUserQuery.Password",
@@ -55,7 +55,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if len(createUserQuery.Name) == 0 {
 		return "", openerrors.OpenFieldEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			Field: "createUserQuery.Name",
@@ -65,7 +65,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if len(createUserQuery.Roles) == 0 {
 		return "", openerrors.OpenFieldEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			Field: "createUserQuery.Roles",
@@ -79,7 +79,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 		default:
 			return "", openerrors.OpenRoleUnknownErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/user_impl.go",
+					File:   "database/mongodb/user_impl.go",
 					Method: "AddUser",
 				},
 				Role:  role,
@@ -107,7 +107,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	sha.Write([]byte(str))
 	hash := hex.EncodeToString(sha.Sum(nil))
 
-	timeNow := primitive.Timestamp{T: uint32(time.Now().Unix())}
+	timeNow := primitive.NewDateTimeFromTime(time.Now().UTC())
 
 	mgUser.Credential = &MgCredential{
 		Login:            createUserQuery.Login,
@@ -126,7 +126,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	if err != nil {
 		return "", openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/user_impl.go",
+				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
 			DbName: ctx.DbName,

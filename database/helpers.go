@@ -1,10 +1,9 @@
-package mongodb
+package database
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"opencourse/common"
 	"opencourse/common/openerrors"
-	"time"
 )
 
 /*
@@ -18,7 +17,7 @@ func (mgAction *MgAction) ToAction() (*common.Action, error) {
 	if mgAction == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/helpers.go",
+				File:   "database/mongodb/helpers.go",
 				Method: "ToAction",
 			},
 			Model: "mgAction",
@@ -39,7 +38,7 @@ func (mgComment *MgComment) ToComment() (*common.Comment, error) {
 	if mgComment == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/helpers.go",
+				File:   "database/mongodb/helpers.go",
 				Method: "ToComment",
 			},
 			Model: "mgComment",
@@ -64,7 +63,7 @@ func (mgComment *MgComment) ToComment() (*common.Comment, error) {
 			if err == nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
-						File:   "data-providers/mongodb/helpers.go",
+						File:   "database/mongodb/helpers.go",
 						Method: "ToComment",
 					},
 					Msg: "can't convert MgAction to Action",
@@ -85,7 +84,7 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 	if mgCourse == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/helpers.go",
+				File:   "database/mongodb/helpers.go",
 				Method: "ToCourse",
 			},
 			Model: "mgCourse",
@@ -100,6 +99,8 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 	course.Name = mgCourse.Name
 	course.Lang = mgCourse.Lang
 	course.Tags = mgCourse.Tags
+	course.HeaderImg = mgCourse.HeaderImg
+	course.Description = mgCourse.Description
 
 	if mgCourse.Comments != nil {
 		course.Comments = []*common.Comment{}
@@ -111,7 +112,7 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
-						File:   "data-providers/mongodb/helpers.go",
+						File:   "database/mongodb/helpers.go",
 						Method: "ToCourse",
 					},
 					Msg: err.Error(),
@@ -133,7 +134,7 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
 					BaseErr: openerrors.OpenBaseErr{
-						File:   "data-providers/mongodb/helpers.go",
+						File:   "database/mongodb/helpers.go",
 						Method: "ToCourse",
 					},
 					Msg: err.Error(),
@@ -147,8 +148,8 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 	course.HeaderImg = mgCourse.HeaderImg
 
 	course.Rating = mgCourse.Rating
-	course.DateCreate = time.Unix(int64(mgCourse.DateCreate.T), 0)
-	course.DateUpdate = time.Unix(int64(mgCourse.DateUpdate.T), 0)
+	course.DateCreate = mgCourse.DateCreate.Time()
+	course.DateUpdate = mgCourse.DateUpdate.Time()
 
 	return &course, nil
 }
@@ -160,7 +161,7 @@ func (mgCategory *MgCategory) ToCategory() (*common.Category, error) {
 	if mgCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/helpers.go",
+				File:   "database/mongodb/helpers.go",
 				Method: "ToCategory",
 			},
 			Model: "mgCategory",
@@ -180,7 +181,7 @@ func (mgCategory *MgCategory) ToCategory() (*common.Category, error) {
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
 				BaseErr: openerrors.OpenBaseErr{
-					File:   "data-providers/mongodb/helpers.go",
+					File:   "database/mongodb/helpers.go",
 					Method: "ToCategory",
 				},
 				Msg: err.Error(),
@@ -200,7 +201,7 @@ func (mgSubCategory *MgSubCategory) ToSubCategory() (*common.SubCategory, error)
 	if mgSubCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/helpers.go",
+				File:   "database/mongodb/helpers.go",
 				Method: "ToSubCategory",
 			},
 			Model: "mgSubCategory",

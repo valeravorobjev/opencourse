@@ -2,7 +2,7 @@ package integration
 
 import (
 	"opencourse/common"
-	"opencourse/data-providers/mongodb"
+	"opencourse/database"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,7 +12,7 @@ const ConnectionString = "mongodb://localhost"
 
 func getContext() common.DbContext {
 
-	context := &mongodb.MgContext{}
+	context := &database.MgContext{}
 
 	// Init default values
 	context.Defaults()

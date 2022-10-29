@@ -1,6 +1,10 @@
-package mongodb
+package database
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
+
+/*
+This file contains sub documents for collections.
+*/
 
 // MgComment for post, course, etc..
 type MgComment struct {
@@ -32,11 +36,11 @@ type MgSubCategory struct {
 
 // MgCredential contains user auth data
 type MgCredential struct {
-	Login            string              `bson:"login"`             // User login
-	Password         string              `bson:"password"`          // User password
-	Salt             int                 `bson:"salt"`              // Salt for generate password
-	Roles            []string            `bson:"roles"`             // User roles
-	IsActive         bool                `bson:"is_active"`         // Is user active or not
-	DateRegistration primitive.Timestamp `bson:"date_registration"` // User registration date
-	UpTime           primitive.Timestamp `bson:"uptime"`            // User uptime
+	Login            string             `bson:"login"`             // User login
+	Password         string             `bson:"password"`          // User password
+	Salt             int                `bson:"salt"`              // Salt for generate password
+	Roles            []string           `bson:"roles"`             // User roles
+	IsActive         bool               `bson:"is_active"`         // Is user active or not
+	DateRegistration primitive.DateTime `bson:"date_registration"` // User registration date
+	UpTime           primitive.DateTime `bson:"uptime"`            // User uptime
 }

@@ -1,4 +1,4 @@
-package mongodb
+package database
 
 import (
 	"context"
@@ -27,7 +27,7 @@ func (ctx *MgContext) Connect(uri string) error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/dbcontext.go",
+				File:   "database/mongodb/dbcontext.go",
 				Method: "Connect",
 			},
 			DbName: ctx.DbName,
@@ -44,7 +44,7 @@ func (ctx *MgContext) Disconnect() error {
 	if err != nil {
 		return openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
-				File:   "data-providers/mongodb/dbcontext.go",
+				File:   "database/mongodb/dbcontext.go",
 				Method: "Disconnect",
 			},
 			DbName: ctx.DbName,
