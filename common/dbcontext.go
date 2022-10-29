@@ -7,7 +7,7 @@ type DbContext interface {
 
 	AddUser(createUserQuery *AddUserQuery) (string, error)
 
-	GetCategories(langs []string) ([]*OpenCategory, error)
+	GetCategories(langs []string) ([]*Category, error)
 	AddCategory(addCategoryQuery *AddCategoryQuery) (string, error)
 	UpdateCategory(cid string, name string) error
 	UpdateSubCategory(cid string, scn int, name string) error
