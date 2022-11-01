@@ -43,3 +43,18 @@ type DbCredential struct {
 	DateRegistration primitive.DateTime `bson:"date_registration"` // User registration date
 	UpTime           primitive.DateTime `bson:"uptime"`            // User uptime
 }
+
+type Option struct {
+	Answer  string `bson:"answer"`
+	IsRight bool   `bson:"is_right"`
+}
+
+type DbOptionTest struct {
+	Question string    `bson:"question"`
+	Options  []*Option `bson:"options"`
+}
+
+type DbRewriteTest struct {
+	Question    string `bson:"question"`
+	RightAnswer bool   `bson:"right_answer"`
+}

@@ -28,6 +28,12 @@ const (
 	RoleAdmin  = "Administrator" // Privileged user role
 )
 
+// Test types
+const (
+	TestOption  = "option"  // Test with options (variant answers)
+	TestRewrite = "rewrite" // Rewrite test. User need write key text from the question
+)
+
 // User user common model
 type User struct {
 	Id     string   `json:"id"`     // User id
