@@ -53,15 +53,19 @@ type AddUserQuery struct {
 
 // Category for course
 type Category struct {
-	Id   string `json:"id"`
-	Lang string `json:"lang"` // Support language
-	Name string `json:"name"`
+	Id        string `json:"id"`         // Category id
+	Lang      string `json:"lang"`       // Support language
+	Name      string `json:"name"`       // Category name
+	IconImg   string `json:"icon_img"`   // Icon for category
+	HeaderImg string `json:"header_img"` // Header image
 }
 
 // AddCategoryQuery model for create category
 type AddCategoryQuery struct {
-	Lang string `json:"lang"` // Support language
-	Name string `json:"name"`
+	Lang      string `json:"lang"`       // Support language
+	Name      string `json:"name"`       // Category name
+	IconImg   string `json:"icon_img"`   // Icon for category
+	HeaderImg string `json:"header_img"` // Header image
 }
 
 // UpdateCategoryQuery model for update category
@@ -80,11 +84,29 @@ type Course struct {
 	Tags        []string `json:"tags"`                  // Course tags
 	Rating      int      `json:"rating"`                // Course rating
 	Description string   `json:"description,omitempty"` // Course description
+	IconImg     string   `json:"icon_img"`              // Icon for category
+	HeaderImg   string   `json:"header_img"`            // Header image
 }
 
 // AddCourseQuery add course query
 type AddCourseQuery struct {
-	Name       string   `json:"name"`        // Course name
-	CategoryId string   `json:"category_id"` // Course category
-	Tags       []string `json:"tags"`        // Course tags
+	Name        string   `json:"name"`        // Course name
+	CategoryId  string   `json:"category_id"` // Course category
+	Tags        []string `json:"tags"`        // Course tags
+	Description string   `json:"description"` // Course description
+	IconImg     string   `json:"icon_img"`    // Icon for category
+	HeaderImg   string   `json:"header_img"`  // Header image
+}
+
+type PostContent struct {
+	Body       string   `json:"body"`        // Post's body
+	MediaItems []string `json:"media_items"` // Various attachments
+}
+
+type Stage struct {
+	Id        string         `json:"id"`         // Stage id
+	CourseId  string         `json:"course_id"`  // Course id. One course has many stages
+	Name      string         `json:"name"`       // Course stage name
+	Contents  []*PostContent `json:"contents"`   // Stage contents
+	HeaderImg string         `json:"header_img"` // Header image
 }

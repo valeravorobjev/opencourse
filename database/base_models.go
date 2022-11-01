@@ -12,12 +12,6 @@ type DbPostContent struct {
 	MediaItems []string `bson:"media_items,omitempty"` // Various attachments
 }
 
-// DbSubCategory for category
-type DbSubCategory struct {
-	Number int    `bson:"number"` // Sub category number
-	Name   string `bson:"name"`   // Sub category name
-}
-
 // DbCredential contains user auth data
 type DbCredential struct {
 	Login            string             `bson:"login"`             // User login

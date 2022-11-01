@@ -28,6 +28,8 @@ func (dbCourse *DbCourse) ToCourse() (*common.Course, error) {
 	course.Description = dbCourse.Description
 	course.Rating = dbCourse.Rating
 	course.Enabled = dbCourse.Enabled
+	course.IconImg = dbCourse.IconImg
+	course.HeaderImg = dbCourse.HeaderImg
 
 	return &course, nil
 }
@@ -51,6 +53,8 @@ func (dbCategory *DbCategory) ToCategory() (*common.Category, error) {
 	category.Id = dbCategory.Id.Hex()
 	category.Name = dbCategory.Name
 	category.Lang = dbCategory.Lang
+	category.IconImg = dbCategory.IconImg
+	category.HeaderImg = dbCategory.HeaderImg
 
 	return &category, nil
 }

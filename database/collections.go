@@ -19,9 +19,11 @@ type DbUser struct {
 
 // DbCategory of curses collection
 type DbCategory struct {
-	Id   primitive.ObjectID `bson:"_id,omitempty"` // Category id
-	Lang string             `bson:"lang"`          // Language
-	Name string             `bson:"name"`          // Category name
+	Id        primitive.ObjectID `bson:"_id,omitempty"` // Category id
+	Lang      string             `bson:"lang"`          // Language
+	Name      string             `bson:"name"`          // Category name
+	IconImg   string             `bson:"icon_img"`      // Icon for category
+	HeaderImg string             `bson:"header_img"`    // Header image
 }
 
 // DbCourse collection
@@ -33,14 +35,17 @@ type DbCourse struct {
 	Tags        []string           `bson:"tags,omitempty"` // Course tags
 	Rating      int                `bson:"rating"`         // Course rating
 	Description string             `bson:"description"`    // Course description
+	IconImg     string             `bson:"icon_img"`       // Icon for category
+	HeaderImg   string             `bson:"header_img"`     // Header image
 }
 
 // DbStage collection
 type DbStage struct {
-	Id       primitive.ObjectID `bson:"_id,omitempty"` // Stage id
-	CourseId primitive.ObjectID `bson:"course_id"`     // Course id. One course has many stages
-	Name     string             `bson:"name"`          // Course stage name
-	Contents []*DbPostContent   `bson:"contents"`      // Stage contents
+	Id        primitive.ObjectID `bson:"_id,omitempty"` // Stage id
+	CourseId  primitive.ObjectID `bson:"course_id"`     // Course id. One course has many stages
+	Name      string             `bson:"name"`          // Course stage name
+	Contents  []*DbPostContent   `bson:"contents"`      // Stage contents
+	HeaderImg string             `bson:"header_img"`    // Header image
 }
 
 // DbTest collection
