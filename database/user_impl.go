@@ -13,8 +13,8 @@ import (
 )
 
 /*
-AddUser create user and save his to database
-@createUserQuery - create user model
+AddUser create user and save his to database. Parameters:
+createUserQuery - create user model;
 */
 func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(UserCollection)

@@ -6,21 +6,6 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 This file contains sub documents for collections.
 */
 
-// DbComment for post, course, etc..
-type DbComment struct {
-	Id       primitive.ObjectID `bson:"id"`                  // Comment id
-	UserId   primitive.ObjectID `bson:"user_id"`             // User id
-	Text     string             `bson:"text"`                // Comment text
-	Actions  []*DbAction        `bson:"actions,omitempty"`   // Actions for comment
-	ParentId primitive.ObjectID `bson:"parent_id,omitempty"` // ParentId parent's comment id
-}
-
-// DbAction of user
-type DbAction struct {
-	UserId     primitive.ObjectID `bson:"user_id"`     // User id
-	ActionType string             `bson:"action_type"` // Action type
-}
-
 // DbPostContent contains text and media data for stages
 type DbPostContent struct {
 	Body       string   `bson:"body"`                  // Post's body

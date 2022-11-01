@@ -1,9 +1,5 @@
 package common
 
-import (
-	"time"
-)
-
 // Open - project prefix
 
 // Languages types
@@ -55,73 +51,40 @@ type AddUserQuery struct {
 	Roles    []string `json:"roles"`    // User roles
 }
 
-// SubCategory sub category
-type SubCategory struct {
-	Number int    `json:"number"`
-	Name   string `json:"name"`
-}
-
 // Category for course
 type Category struct {
-	Id            string         `json:"id"`
-	Lang          string         `json:"lang"` // Support language
-	Name          string         `json:"name"`
-	SubCategories []*SubCategory `json:"sub_categories"`
+	Id   string `json:"id"`
+	Lang string `json:"lang"` // Support language
+	Name string `json:"name"`
 }
 
 // AddCategoryQuery model for create category
 type AddCategoryQuery struct {
-	Lang          string         `json:"lang"` // Support language
-	Name          string         `json:"name"`
-	SubCategories []*SubCategory `json:"sub_categories"`
+	Lang string `json:"lang"` // Support language
+	Name string `json:"name"`
 }
 
 // UpdateCategoryQuery model for update category
 type UpdateCategoryQuery struct {
-	CategoryId    string         `json:"category_id"`
-	Langs         []string       `json:"lang"` // Support language
-	Name          string         `json:"name"`
-	SubCategories []*SubCategory `json:"sub_categories"`
+	CategoryId string   `json:"category_id"`
+	Langs      []string `json:"lang"` // Support language
+	Name       string   `json:"name"`
 }
 
 // Course model
 type Course struct {
-	Id                string     `json:"id"`                    // Course id
-	Lang              string     `json:"lang"`                  // Support language
-	Name              string     `json:"name"`                  // Course name
-	CategoryId        string     `json:"category_id"`           // Course category
-	SubCategoryNumber int        `json:"sub_category_number"`   // Course sub category
-	Tags              []string   `json:"tags"`                  // Course tags
-	HeaderImg         string     `json:"header_img"`            // Course header image
-	DateCreate        time.Time  `json:"date_create"`           // Create date of course
-	DateUpdate        time.Time  `json:"date_update"`           // Update date of course
-	Rating            int        `json:"rating"`                // Course rating
-	Description       string     `json:"description,omitempty"` // Course description
-	Actions           []*Action  `json:"actions,omitempty"`     // Actions for comments
-	Comments          []*Comment `json:"comments,omitempty"`    // Comments for this post
-}
-
-// Comment user comment
-type Comment struct {
-	Id       string    `json:"id"`        // Comment id
-	UserId   string    `json:"user_id"`   // User id
-	Text     string    `json:"text"`      // Comment text
-	Actions  []*Action `json:"actions"`   // Actions for comment
-	ParentId string    `json:"parent_id"` // ParentId parent's comment id
-}
-
-// Action user action
-type Action struct {
-	UserId     string `json:"user_id"`
-	ActionType string `json:"action_type"`
+	Id          string   `json:"id"`                    // Course id
+	Name        string   `json:"name"`                  // Course name
+	CategoryId  string   `json:"category_id"`           // Course category
+	Enabled     bool     `json:"enabled"`               // Enabled course
+	Tags        []string `json:"tags"`                  // Course tags
+	Rating      int      `json:"rating"`                // Course rating
+	Description string   `json:"description,omitempty"` // Course description
 }
 
 // AddCourseQuery add course query
 type AddCourseQuery struct {
-	Lang              string   `json:"lang"`                // Support languages
-	Name              string   `json:"name"`                // Course name
-	CategoryId        string   `json:"category_id"`         // Course category
-	SubCategoryNumber int      `json:"sub_category_number"` // Course sub category
-	Tags              []string `json:"tags"`                // Course tags
-	HeaderImg         string   `json:"header_img"`          // Course header image
+	Name       string   `json:"name"`        // Course name
+	CategoryId string   `json:"category_id"` // Course category
+	Tags       []string `json:"tags"`        // Course tags
 }
