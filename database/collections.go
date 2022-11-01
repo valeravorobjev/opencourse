@@ -42,7 +42,18 @@ type DbStage struct {
 	Contents []*DbPostContent   `bson:"contents"`      // Stage contents
 }
 
-type DbTest[T any] struct {
+type DbTest struct {
+	Id            primitive.ObjectID `bson:"_id,omitempty"`
+	StageId       primitive.ObjectID `bson:"stage_id"`
+	TestType      string             `bson:"test_type"`
+	LemmingsCount int                `bson:"lemmings_count"`
+	OptionTest    *DbOptionTest      `bson:"option_test,omitempty"`
+	RewriteTest   *DbRewriteTest     `bson:"rewrite_test,omitempty"`
+}
+
+type DbUserTest struct {
 	Id       primitive.ObjectID `bson:"_id,omitempty"`
-	TestType string             `bson:"test_type"`
+	TestId   primitive.ObjectID `bson:"test_id,omitempty"`
+	UserId   primitive.ObjectID `bson:"user_id"`
+	IsPassed bool               `bson:"is_passed"`
 }
