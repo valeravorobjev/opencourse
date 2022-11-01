@@ -11,7 +11,7 @@ import (
 )
 
 // GetCategories return all categories from db
-func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) {
+func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	find := bson.D{
@@ -36,9 +36,9 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 		}
 	}
 
-	var mgCategories []*MgCategory
+	var dbCategories []*DbCategory
 
-	err = cursor.Decode(mgCategories)
+	err = cursor.Decode(dbCategories)
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
 			BaseErr: openerrors.OpenBaseErr{
@@ -53,8 +53,8 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 
 	var categories []*common.Category
 
-	for _, mgCategory := range mgCategories {
-		category, err := mgCategory.ToCategory()
+	for _, dbCategory := range dbCategories {
+		category, err := dbCategory.ToCategory()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
@@ -73,17 +73,17 @@ func (ctx *MgContext) GetCategories(langs []string) ([]*common.Category, error) 
 }
 
 // AddCategory method for add new category and sub categories to database
-func (ctx *MgContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
+func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
-	category := MgCategory{}
+	category := DbCategory{}
 
 	category.Name = addCategoryQuery.Name
 	category.Lang = addCategoryQuery.Lang
 
 	for _, openSubCategory := range addCategoryQuery.SubCategories {
 
-		subCategory := &MgSubCategory{Number: openSubCategory.Number, Name: openSubCategory.Name}
+		subCategory := &DbSubCategory{Number: openSubCategory.Number, Name: openSubCategory.Name}
 		category.SubCategories = append(category.SubCategories, subCategory)
 	}
 
@@ -111,7 +111,7 @@ UpdateCategory update category name
 @cid - category id
 @names - category names
 */
-func (ctx *MgContext) UpdateCategory(cid string, name string) error {
+func (ctx *DbContext) UpdateCategory(cid string, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
@@ -147,7 +147,7 @@ UpdateSubCategory update sub category names
 @scn - sub category number
 @names - sub category names
 */
-func (ctx *MgContext) UpdateSubCategory(cid string, scn int, name string) error {
+func (ctx *DbContext) UpdateSubCategory(cid string, scn int, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	filter := bson.D{
@@ -186,7 +186,7 @@ AddSubCategory add sub category for category.
 @name - sub category name
 @lang - sub category language
 */
-func (ctx *MgContext) AddSubCategory(cid string, name string) error {
+func (ctx *DbContext) AddSubCategory(cid string, name string) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
@@ -209,7 +209,7 @@ func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 		{"_id", categoryId},
 	}
 
-	var category MgCategory
+	var category DbCategory
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
@@ -224,15 +224,15 @@ func (ctx *MgContext) AddSubCategory(cid string, name string) error {
 		}
 	}
 
-	var subCategory *MgSubCategory
+	var subCategory *DbSubCategory
 
 	if len(category.SubCategories) == 0 {
-		subCategory = &MgSubCategory{Number: 0, Name: name}
+		subCategory = &DbSubCategory{Number: 0, Name: name}
 	} else {
 		lastSubCategory := category.SubCategories[len(category.SubCategories)-1]
 
 		subCategory =
-			&MgSubCategory{Number: lastSubCategory.Number + 1, Name: name}
+			&DbSubCategory{Number: lastSubCategory.Number + 1, Name: name}
 	}
 
 	update := bson.D{
@@ -264,7 +264,7 @@ DeleteSubCategory delete sub category from category
 @cid - category id
 @scn - sub category number
 */
-func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
+func (ctx *DbContext) DeleteSubCategory(cid string, scn int) error {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	categoryId, err := primitive.ObjectIDFromHex(cid)
@@ -287,7 +287,7 @@ func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 		{"_id", categoryId},
 	}
 
-	var category MgCategory
+	var category DbCategory
 	err = col.FindOne(context.Background(), filter).Decode(&category)
 
 	if err != nil && err != mongo.ErrNoDocuments {
@@ -306,7 +306,7 @@ func (ctx *MgContext) DeleteSubCategory(cid string, scn int) error {
 		return nil
 	}
 
-	var subCategories []*MgSubCategory
+	var subCategories []*DbSubCategory
 	number := 0
 	for _, item := range category.SubCategories {
 		if item.Number == scn {

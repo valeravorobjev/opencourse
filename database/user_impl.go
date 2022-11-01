@@ -16,7 +16,7 @@ import (
 AddUser create user and save his to database
 @createUserQuery - create user model
 */
-func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, error) {
+func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(UserCollection)
 
 	// Validate create user model
@@ -90,12 +90,12 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 
 	// Create new user
 
-	var mgUser MgUser
+	var dbUser DbUser
 
-	mgUser.Name = createUserQuery.Name
-	mgUser.Avatar = createUserQuery.Avatar
-	mgUser.Email = createUserQuery.Email
-	mgUser.Rating = 0
+	dbUser.Name = createUserQuery.Name
+	dbUser.Avatar = createUserQuery.Avatar
+	dbUser.Email = createUserQuery.Email
+	dbUser.Rating = 0
 
 	rand.Seed(time.Now().UnixNano())
 	minRand := 10000000
@@ -109,7 +109,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 
 	timeNow := primitive.NewDateTimeFromTime(time.Now().UTC())
 
-	mgUser.Credential = &MgCredential{
+	dbUser.Credential = &DbCredential{
 		Login:            createUserQuery.Login,
 		Password:         hash,
 		Salt:             salt,
@@ -121,7 +121,7 @@ func (ctx *MgContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 
 	// Save user to DB
 
-	result, err := col.InsertOne(context.Background(), mgUser)
+	result, err := col.InsertOne(context.Background(), dbUser)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{

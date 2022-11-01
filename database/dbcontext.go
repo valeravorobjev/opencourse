@@ -8,20 +8,20 @@ import (
 	"opencourse/common/openerrors"
 )
 
-// MgContext is a context for work with mongo db
-type MgContext struct {
+// DbContext is a context for work with mongo db
+type DbContext struct {
 	Uri    string        // Connection string
 	DbName string        // Db name. Example: mongodb/opencourse
 	Client *mongo.Client // Client connection for db
 }
 
 // Defaults init values
-func (ctx *MgContext) Defaults() {
+func (ctx *DbContext) Defaults() {
 	ctx.DbName = fmt.Sprintf("mongodb/%s", DbName)
 }
 
 // Connect to db
-func (ctx *MgContext) Connect(uri string) error {
+func (ctx *DbContext) Connect(uri string) error {
 	ctx.Uri = uri
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
@@ -39,7 +39,7 @@ func (ctx *MgContext) Connect(uri string) error {
 }
 
 // Disconnect db
-func (ctx *MgContext) Disconnect() error {
+func (ctx *DbContext) Disconnect() error {
 	err := ctx.Client.Disconnect(context.Background())
 	if err != nil {
 		return openerrors.OpenDbErr{

@@ -11,54 +11,54 @@ This file contains methods for mapping common (Open) models to MongoDB models
 */
 
 /*
-ToAction map MgAction to Action
+ToAction map DbAction to Action
 */
-func (mgAction *MgAction) ToAction() (*common.Action, error) {
-	if mgAction == nil {
+func (dbAction *DbAction) ToAction() (*common.Action, error) {
+	if dbAction == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "database/mongodb/helpers.go",
 				Method: "ToAction",
 			},
-			Model: "mgAction",
+			Model: "dbAction",
 		}
 	}
 
 	var action common.Action
-	action.ActionType = mgAction.ActionType
-	action.UserId = mgAction.UserId.Hex()
+	action.ActionType = dbAction.ActionType
+	action.UserId = dbAction.UserId.Hex()
 
 	return &action, nil
 }
 
 /*
-ToComment map MgComment to Comment
+ToComment map DbComment to Comment
 */
-func (mgComment *MgComment) ToComment() (*common.Comment, error) {
-	if mgComment == nil {
+func (dbComment *DbComment) ToComment() (*common.Comment, error) {
+	if dbComment == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "database/mongodb/helpers.go",
 				Method: "ToComment",
 			},
-			Model: "mgComment",
+			Model: "dbComment",
 		}
 	}
 
 	var comment common.Comment
 
-	comment.Id = mgComment.Id.Hex()
-	comment.UserId = mgComment.UserId.Hex()
-	comment.Text = mgComment.Text
-	if primitive.ObjectID.IsZero(mgComment.ParentId) == false {
-		comment.ParentId = mgComment.ParentId.Hex()
+	comment.Id = dbComment.Id.Hex()
+	comment.UserId = dbComment.UserId.Hex()
+	comment.Text = dbComment.Text
+	if primitive.ObjectID.IsZero(dbComment.ParentId) == false {
+		comment.ParentId = dbComment.ParentId.Hex()
 	}
 
-	if mgComment.Actions != nil {
+	if dbComment.Actions != nil {
 		comment.Actions = []*common.Action{}
 
-		for _, mgAction := range mgComment.Actions {
-			action, err := mgAction.ToAction()
+		for _, dbAction := range dbComment.Actions {
+			action, err := dbAction.ToAction()
 
 			if err == nil {
 				return nil, openerrors.OpenDefaultErr{
@@ -66,7 +66,7 @@ func (mgComment *MgComment) ToComment() (*common.Comment, error) {
 						File:   "database/mongodb/helpers.go",
 						Method: "ToComment",
 					},
-					Msg: "can't convert MgAction to Action",
+					Msg: "can't convert DbAction to Action",
 				}
 			}
 
@@ -78,36 +78,36 @@ func (mgComment *MgComment) ToComment() (*common.Comment, error) {
 }
 
 /*
-ToCourse map MgCourse to Course
+ToCourse map DbCourse to Course
 */
-func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
-	if mgCourse == nil {
+func (dbCourse *DbCourse) ToCourse() (*common.Course, error) {
+	if dbCourse == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "database/mongodb/helpers.go",
 				Method: "ToCourse",
 			},
-			Model: "mgCourse",
+			Model: "dbCourse",
 		}
 	}
 
 	var course common.Course
 
-	course.Id = mgCourse.Id.Hex()
-	course.CategoryId = mgCourse.CategoryId.Hex()
-	course.SubCategoryNumber = mgCourse.SubCategoryNumber
-	course.Name = mgCourse.Name
-	course.Lang = mgCourse.Lang
-	course.Tags = mgCourse.Tags
-	course.HeaderImg = mgCourse.HeaderImg
-	course.Description = mgCourse.Description
+	course.Id = dbCourse.Id.Hex()
+	course.CategoryId = dbCourse.CategoryId.Hex()
+	course.SubCategoryNumber = dbCourse.SubCategoryNumber
+	course.Name = dbCourse.Name
+	course.Lang = dbCourse.Lang
+	course.Tags = dbCourse.Tags
+	course.HeaderImg = dbCourse.HeaderImg
+	course.Description = dbCourse.Description
 
-	if mgCourse.Comments != nil {
+	if dbCourse.Comments != nil {
 		course.Comments = []*common.Comment{}
 
-		for _, mgComment := range mgCourse.Comments {
+		for _, dbComment := range dbCourse.Comments {
 
-			comment, err := mgComment.ToComment()
+			comment, err := dbComment.ToComment()
 
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
@@ -124,12 +124,12 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 
 	}
 
-	if mgCourse.Actions != nil {
+	if dbCourse.Actions != nil {
 		course.Actions = []*common.Action{}
 
-		for _, mgAction := range mgCourse.Actions {
+		for _, dbAction := range dbCourse.Actions {
 
-			action, err := mgAction.ToAction()
+			action, err := dbAction.ToAction()
 
 			if err != nil {
 				return nil, openerrors.OpenDefaultErr{
@@ -145,38 +145,38 @@ func (mgCourse *MgCourse) ToCourse() (*common.Course, error) {
 		}
 	}
 
-	course.HeaderImg = mgCourse.HeaderImg
+	course.HeaderImg = dbCourse.HeaderImg
 
-	course.Rating = mgCourse.Rating
-	course.DateCreate = mgCourse.DateCreate.Time()
-	course.DateUpdate = mgCourse.DateUpdate.Time()
+	course.Rating = dbCourse.Rating
+	course.DateCreate = dbCourse.DateCreate.Time()
+	course.DateUpdate = dbCourse.DateUpdate.Time()
 
 	return &course, nil
 }
 
 /*
-ToCategory map MgCategory to Category
+ToCategory map DbCategory to Category
 */
-func (mgCategory *MgCategory) ToCategory() (*common.Category, error) {
-	if mgCategory == nil {
+func (dbCategory *DbCategory) ToCategory() (*common.Category, error) {
+	if dbCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "database/mongodb/helpers.go",
 				Method: "ToCategory",
 			},
-			Model: "mgCategory",
+			Model: "dbCategory",
 		}
 	}
 
 	var category common.Category
 
-	category.Id = mgCategory.Id.Hex()
-	category.Name = mgCategory.Name
-	category.Lang = mgCategory.Lang
+	category.Id = dbCategory.Id.Hex()
+	category.Name = dbCategory.Name
+	category.Lang = dbCategory.Lang
 
-	for _, mgSubCategory := range mgCategory.SubCategories {
+	for _, dbSubCategory := range dbCategory.SubCategories {
 
-		subCategory, err := mgSubCategory.ToSubCategory()
+		subCategory, err := dbSubCategory.ToSubCategory()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
@@ -195,22 +195,22 @@ func (mgCategory *MgCategory) ToCategory() (*common.Category, error) {
 }
 
 /*
-ToSubCategory map MgSubCategory to SubCategory
+ToSubCategory map DbSubCategory to SubCategory
 */
-func (mgSubCategory *MgSubCategory) ToSubCategory() (*common.SubCategory, error) {
-	if mgSubCategory == nil {
+func (dbSubCategory *DbSubCategory) ToSubCategory() (*common.SubCategory, error) {
+	if dbSubCategory == nil {
 		return nil, openerrors.OpenModelNilOrEmptyErr{
 			BaseErr: openerrors.OpenBaseErr{
 				File:   "database/mongodb/helpers.go",
 				Method: "ToSubCategory",
 			},
-			Model: "mgSubCategory",
+			Model: "dbSubCategory",
 		}
 	}
 
 	var subCategory common.SubCategory
-	subCategory.Number = mgSubCategory.Number
-	subCategory.Name = mgSubCategory.Name
+	subCategory.Number = dbSubCategory.Number
+	subCategory.Name = dbSubCategory.Name
 
 	return &subCategory, nil
 

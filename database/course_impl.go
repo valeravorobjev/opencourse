@@ -11,7 +11,7 @@ import (
 )
 
 // ClearCourses remove all data from course collection
-func (ctx *MgContext) ClearCourses() error {
+func (ctx *DbContext) ClearCourses() error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	_, err := col.DeleteMany(context.Background(), bson.D{{}})
@@ -35,7 +35,7 @@ func (ctx *MgContext) ClearCourses() error {
 GetCourse return course from db by id
 @id - course id
 */
-func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
+func (ctx *DbContext) GetCourse(id string) (*common.Course, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
@@ -57,8 +57,8 @@ func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 		{"_id", objectId},
 	}
 
-	var mgCourse MgCourse
-	err = col.FindOne(context.Background(), filter).Decode(&mgCourse)
+	var dbCourse DbCourse
+	err = col.FindOne(context.Background(), filter).Decode(&dbCourse)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
@@ -72,7 +72,7 @@ func (ctx *MgContext) GetCourse(id string) (*common.Course, error) {
 		}
 	}
 
-	course, err := mgCourse.ToCourse()
+	course, err := dbCourse.ToCourse()
 
 	if err != nil {
 		return nil, openerrors.OpenDefaultErr{
@@ -94,7 +94,7 @@ GetCourses return courses from db
 
 TODO: Now, courses range by rating and date. Need to upgrade rage system
 */
-func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, error) {
+func (ctx *DbContext) GetCourses(take int64, skip int64) ([]*common.Course, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	ops := options.Find().SetLimit(take).SetSkip(skip).
@@ -114,9 +114,9 @@ func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 		}
 	}
 
-	var mgCourses []*MgCourse
+	var dbCourses []*DbCourse
 
-	err = cursor.All(context.Background(), &mgCourses)
+	err = cursor.All(context.Background(), &dbCourses)
 
 	if err != nil {
 		return nil, openerrors.OpenDbErr{
@@ -132,8 +132,8 @@ func (ctx *MgContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 
 	var courses []*common.Course
 
-	for _, mgCourse := range mgCourses {
-		course, err := mgCourse.ToCourse()
+	for _, dbCourse := range dbCourses {
+		course, err := dbCourse.ToCourse()
 
 		if err != nil {
 			return nil, openerrors.OpenDefaultErr{
@@ -156,13 +156,13 @@ AddCourse add course to db
 userId - user id how create new course. He also set to course authors
 @course - entity for save to db
 */
-func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, error) {
+func (ctx *DbContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	var mgCourse MgCourse
-	mgCourse.Name = addCourseQuery.Name
-	mgCourse.Lang = addCourseQuery.Lang
+	var dbCourse DbCourse
+	dbCourse.Name = addCourseQuery.Name
+	dbCourse.Lang = addCourseQuery.Lang
 
 	objectCategoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
 
@@ -178,10 +178,10 @@ func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 		}
 	}
 
-	mgCourse.CategoryId = objectCategoryId
-	mgCourse.SubCategoryNumber = addCourseQuery.SubCategoryNumber
-	mgCourse.HeaderImg = addCourseQuery.HeaderImg
-	mgCourse.Tags = addCourseQuery.Tags
+	dbCourse.CategoryId = objectCategoryId
+	dbCourse.SubCategoryNumber = addCourseQuery.SubCategoryNumber
+	dbCourse.HeaderImg = addCourseQuery.HeaderImg
+	dbCourse.Tags = addCourseQuery.Tags
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
@@ -194,14 +194,14 @@ func (ctx *MgContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 			DbErr:  err.Error(),
 		}
 	}
-	mgCourse.Rating = 0
+	dbCourse.Rating = 0
 
 	nowUtcTime := time.Now().UTC()
 
-	mgCourse.DateCreate = primitive.NewDateTimeFromTime(nowUtcTime)
-	mgCourse.DateUpdate = primitive.NewDateTimeFromTime(nowUtcTime)
+	dbCourse.DateCreate = primitive.NewDateTimeFromTime(nowUtcTime)
+	dbCourse.DateUpdate = primitive.NewDateTimeFromTime(nowUtcTime)
 
-	result, err := col.InsertOne(context.Background(), mgCourse)
+	result, err := col.InsertOne(context.Background(), dbCourse)
 
 	if err != nil {
 		return "", openerrors.OpenDbErr{
@@ -226,7 +226,7 @@ AddCourseAction set action for course
 @userId - user id
 @actionType - type of action
 */
-func (ctx *MgContext) AddCourseAction(id string, userId string, actionType string) error {
+func (ctx *DbContext) AddCourseAction(id string, userId string, actionType string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -257,7 +257,7 @@ func (ctx *MgContext) AddCourseAction(id string, userId string, actionType strin
 		}
 	}
 
-	action := MgAction{UserId: objectUserId, ActionType: actionType}
+	action := DbAction{UserId: objectUserId, ActionType: actionType}
 
 	filter := bson.D{
 		{"_id", objectId},
@@ -290,7 +290,7 @@ RemoveCourseAction remove action from course
 @id - course id
 @userId - user id
 */
-func (ctx *MgContext) RemoveCourseAction(id string, userId string) error {
+func (ctx *DbContext) RemoveCourseAction(id string, userId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -342,7 +342,7 @@ ChangeCourseAction change course action
 @userId - user id
 @actionType - type of action
 */
-func (ctx *MgContext) ChangeCourseAction(id string, userId string, actionType string) error {
+func (ctx *DbContext) ChangeCourseAction(id string, userId string, actionType string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -401,7 +401,7 @@ AddCourseComment add comment to course or for another course comment
 @userId - user id
 @text - comment's text
 */
-func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (string, error) {
+func (ctx *DbContext) AddCourseComment(id string, userId string, text string) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectUserId, err := primitive.ObjectIDFromHex(userId)
@@ -432,14 +432,14 @@ func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (s
 		}
 	}
 
-	mgComment := &MgComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
+	dbComment := &DbComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text}
 
 	find := bson.D{
 		{"_id", objectId},
 	}
 
 	update := bson.D{
-		{"$push", bson.D{{"comments", mgComment}}},
+		{"$push", bson.D{{"comments", dbComment}}},
 	}
 
 	_, err = col.UpdateOne(context.Background(), find, update)
@@ -456,7 +456,7 @@ func (ctx *MgContext) AddCourseComment(id string, userId string, text string) (s
 		}
 	}
 
-	return mgComment.Id.Hex(), nil
+	return dbComment.Id.Hex(), nil
 }
 
 /*
@@ -466,7 +466,7 @@ ReplyCourseComment reply course comment
 @commentId - comment id
 @text - comment's text
 */
-func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId string, text string) error {
+func (ctx *DbContext) ReplyCourseComment(id string, userId string, commentId string, text string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectUserId, err := primitive.ObjectIDFromHex(userId)
@@ -511,7 +511,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 		}
 	}
 
-	mgComment := &MgComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, ParentId: objectCommentId}
+	dbComment := &DbComment{Id: primitive.NewObjectID(), UserId: objectUserId, Text: text, ParentId: objectCommentId}
 
 	find := bson.D{
 		{"_id", objectId},
@@ -520,7 +520,7 @@ func (ctx *MgContext) ReplyCourseComment(id string, userId string, commentId str
 
 	update := bson.D{
 		{"$push", bson.D{
-			{"comments", mgComment},
+			{"comments", dbComment},
 		}},
 	}
 
@@ -546,7 +546,7 @@ RemoveCourseComment remove comment from course
 @id - course id
 @commentId - comment id
 */
-func (ctx *MgContext) RemoveCourseComment(id string, commentId string) error {
+func (ctx *DbContext) RemoveCourseComment(id string, commentId string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectCommentId, err := primitive.ObjectIDFromHex(commentId)
@@ -619,7 +619,7 @@ AddCourseTags - add tags to course
 @id - course id
 @tags - tags
 */
-func (ctx *MgContext) AddCourseTags(id string, tags []string) error {
+func (ctx *DbContext) AddCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -672,7 +672,7 @@ RemoveCourseTags - remove tags from course
 @id - course id
 @tags - tags
 */
-func (ctx *MgContext) RemoveCourseTags(id string, tags []string) error {
+func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
 	objectId, err := primitive.ObjectIDFromHex(id)

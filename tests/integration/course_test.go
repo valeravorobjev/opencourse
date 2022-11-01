@@ -12,7 +12,7 @@ const ConnectionString = "mongodb://localhost"
 
 func getContext() common.DbContext {
 
-	context := &database.MgContext{}
+	context := &database.DbContext{}
 
 	// Init default values
 	context.Defaults()
