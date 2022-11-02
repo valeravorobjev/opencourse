@@ -22,8 +22,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	// Validate create user model
 
 	if len(createUserQuery.Login) == 0 {
-		return "", openerrors.OpenFieldEmptyErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.FieldEmptyErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
@@ -32,8 +32,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	}
 
 	if len(createUserQuery.Password) == 0 {
-		return "", openerrors.OpenFieldEmptyErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.FieldEmptyErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
@@ -42,8 +42,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	}
 
 	if len(createUserQuery.Password) < 5 {
-		return "", openerrors.OpenMinLenErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.MinLenErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
@@ -53,8 +53,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	}
 
 	if len(createUserQuery.Name) == 0 {
-		return "", openerrors.OpenFieldEmptyErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.FieldEmptyErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
@@ -63,8 +63,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	}
 
 	if len(createUserQuery.Roles) == 0 {
-		return "", openerrors.OpenFieldEmptyErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.FieldEmptyErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},
@@ -77,8 +77,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 		case common.RoleUser, common.RoleAuthor, common.RoleAdmin:
 			continue
 		default:
-			return "", openerrors.OpenRoleUnknownErr{
-				BaseErr: openerrors.OpenBaseErr{
+			return "", openerrors.RoleUnknownErr{
+				BaseErr: openerrors.BaseErr{
 					File:   "database/mongodb/user_impl.go",
 					Method: "AddUser",
 				},
@@ -124,8 +124,8 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	result, err := col.InsertOne(context.Background(), dbUser)
 
 	if err != nil {
-		return "", openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return "", openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/user_impl.go",
 				Method: "AddUser",
 			},

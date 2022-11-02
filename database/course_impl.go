@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"opencourse/common"
 	"opencourse/common/openerrors"
+	"time"
 )
 
 // ClearCourses remove all data from course collection
@@ -16,10 +17,10 @@ func (ctx *DbContext) ClearCourses() error {
 	_, err := col.DeleteMany(context.Background(), bson.D{{}})
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
-				Method: "ClearCourseCollection",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
+				Method: "ClearCourses",
 			},
 			DbName: ctx.DbName,
 			ConStr: ctx.Uri,
@@ -32,18 +33,18 @@ func (ctx *DbContext) ClearCourses() error {
 
 /*
 GetCourse return course from db by id. Parameters:
-id - course id;
+courseId - course id;
 */
-func (ctx *DbContext) GetCourse(id string) (*common.Course, error) {
+func (ctx *DbContext) GetCourse(courseId string) (*common.Course, error) {
 
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
 
-	objectId, err := primitive.ObjectIDFromHex(id)
+	objectCourseId, err := primitive.ObjectIDFromHex(courseId)
 
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
@@ -53,16 +54,16 @@ func (ctx *DbContext) GetCourse(id string) (*common.Course, error) {
 	}
 
 	filter := bson.D{
-		{"_id", objectId},
+		{"_id", objectCourseId},
 	}
 
 	var dbCourse DbCourse
 	err = col.FindOne(context.Background(), filter).Decode(&dbCourse)
 
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
@@ -74,9 +75,9 @@ func (ctx *DbContext) GetCourse(id string) (*common.Course, error) {
 	course, err := dbCourse.ToCourse()
 
 	if err != nil {
-		return nil, openerrors.OpenDefaultErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return nil, openerrors.DefaultErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "GetCourse",
 			},
 			Msg: err.Error(),
@@ -88,23 +89,44 @@ func (ctx *DbContext) GetCourse(id string) (*common.Course, error) {
 
 /*
 GetCourses return courses from db. Parameters:
+categoryId - category id. Optional, may be set empty string. Example: "".
 take - how many records need to return;
-skip - how many records deed to skip;
-
-TODO: Now, courses range by rating and date. Need to upgrade rage system
+skip - how many records need to skip;
 */
-func (ctx *DbContext) GetCourses(take int64, skip int64) ([]*common.Course, error) {
+func (ctx *DbContext) GetCourses(categoryId string, take int64, skip int64) ([]*common.Course, error) {
 	col := ctx.Client.Database(DbName).Collection(CourseCollection)
+
+	var filters []bson.D
+
+	if len(categoryId) > 1 {
+		objectCategoryId, err := primitive.ObjectIDFromHex(categoryId)
+
+		if err != nil {
+			return nil, openerrors.InvalidIdErr{
+				Id:        categoryId,
+				Converter: "ObjectIDFromHex",
+				Default: openerrors.DefaultErr{
+					BaseErr: openerrors.BaseErr{
+						File:   "database/course_impl.go",
+						Method: "GetCourses",
+					},
+					Msg: err.Error(),
+				},
+			}
+		}
+
+		filters = append(filters, bson.D{{"category_id", objectCategoryId}})
+	}
 
 	ops := options.Find().SetLimit(take).SetSkip(skip).
 		SetSort(bson.D{{"rating", -1}, {"date_update", -1}})
 
-	cursor, err := col.Find(context.Background(), bson.D{}, ops)
+	cursor, err := col.Find(context.Background(), filters, ops)
 
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
@@ -118,9 +140,9 @@ func (ctx *DbContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 	err = cursor.All(context.Background(), &dbCourses)
 
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
@@ -135,9 +157,9 @@ func (ctx *DbContext) GetCourses(take int64, skip int64) ([]*common.Course, erro
 		course, err := dbCourse.ToCourse()
 
 		if err != nil {
-			return nil, openerrors.OpenDefaultErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "database/mongodb/course_impl.go",
+			return nil, openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/course_impl.go",
 					Method: "GetCourses",
 				},
 				Msg: err.Error(),
@@ -164,9 +186,9 @@ func (ctx *DbContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 	objectCategoryId, err := primitive.ObjectIDFromHex(addCourseQuery.CategoryId)
 
 	if err != nil {
-		return "", openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return "", openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
@@ -179,12 +201,16 @@ func (ctx *DbContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 	dbCourse.Tags = addCourseQuery.Tags
 	dbCourse.Rating = 0
 
+	dateNow := time.Now().UTC()
+	dbCourse.DateCreate = primitive.NewDateTimeFromTime(dateNow)
+	dbCourse.DateUpdate = primitive.NewDateTimeFromTime(dateNow)
+
 	result, err := col.InsertOne(context.Background(), dbCourse)
 
 	if err != nil {
-		return "", openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return "", openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
@@ -209,9 +235,9 @@ func (ctx *DbContext) AddCourseTags(id string, tags []string) error {
 	objectId, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -237,9 +263,9 @@ func (ctx *DbContext) AddCourseTags(id string, tags []string) error {
 	_, err = col.UpdateOne(context.Background(), find, update)
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -262,9 +288,9 @@ func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 	objectId, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
@@ -288,9 +314,9 @@ func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 	_, err = col.UpdateOne(context.Background(), find, update)
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/course_impl.go",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/course_impl.go",
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,

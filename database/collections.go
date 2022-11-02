@@ -37,15 +37,27 @@ type DbCourse struct {
 	Description string             `bson:"description"`    // Course description
 	IconImg     string             `bson:"icon_img"`       // Icon for category
 	HeaderImg   string             `bson:"header_img"`     // Header image
+	DateCreate  primitive.DateTime `bson:"date_create"`    // Date create course
+	DateUpdate  primitive.DateTime `bson:"date_update"`    // Date update course
+}
+
+// DbCoursePromotion collection
+type DbCoursePromotion struct {
+	Id             primitive.ObjectID `bson:"_id,omitempty"`   // Course promotion id
+	CourseId       primitive.ObjectID `bson:"course_id"`       // Course id
+	PromotionType  string             `bson:"promotion_type"`  // Promotion type
+	Label          string             `bson:"label"`           // Promotion label text
+	ExpirationTime primitive.DateTime `bson:"expiration_time"` // Promotion expiration time. After this time doc will be removed
 }
 
 // DbStage collection
 type DbStage struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty"` // Stage id
-	CourseId  primitive.ObjectID `bson:"course_id"`     // Course id. One course has many stages
-	Name      string             `bson:"name"`          // Course stage name
-	Contents  []*DbPostContent   `bson:"contents"`      // Stage contents
-	HeaderImg string             `bson:"header_img"`    // Header image
+	Id          primitive.ObjectID `bson:"_id,omitempty"` // Stage id
+	CourseId    primitive.ObjectID `bson:"course_id"`     // Course id. One course has many stages
+	Name        string             `bson:"name"`          // Course stage name
+	Content     *DbPostContent     `bson:"content"`       // Stage contents
+	HeaderImg   string             `bson:"header_img"`    // Header image
+	OrderNumber int                `bson:"order_number"`  // Stage order number
 }
 
 // DbTest collection
@@ -56,6 +68,7 @@ type DbTest struct {
 	LemmingsCount int                `bson:"lemmings_count"`         // Count of lemmings for passed test
 	OptionTest    *DbOptionTest      `bson:"option_test,omitempty"`  // Option test. Test with option variant answers. Optional
 	RewriteTest   *DbRewriteTest     `bson:"rewrite_test,omitempty"` // Rewrite test. Test with phrase how need write. Optional
+	OrderNumber   int                `bson:"order_number"`           // Test order number
 }
 
 // DbUserTest collection

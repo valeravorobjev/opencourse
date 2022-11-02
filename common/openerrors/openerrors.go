@@ -3,55 +3,55 @@ package openerrors
 // NOTE! In this project, as an experiment, all openerrors are wrapped in special types
 // Open - project prefix
 
-// OpenBaseErr base error model
-type OpenBaseErr struct {
+// BaseErr base error model
+type BaseErr struct {
 	File   string // File contains error
 	Method string // Function or method that throw error
 }
 
-// OpenDefaultErr default error model
-type OpenDefaultErr struct {
-	BaseErr OpenBaseErr // File contains error
-	Msg     string      // Error text message
+// DefaultErr default error model
+type DefaultErr struct {
+	BaseErr BaseErr // File contains error
+	Msg     string  // Error text message
 }
 
-// OpenFieldEmptyErr error if required field is empty in the model
-type OpenFieldEmptyErr struct {
-	BaseErr OpenBaseErr // File contains error
-	Field   string      // Field name
+// FieldEmptyErr error if required field is empty in the model
+type FieldEmptyErr struct {
+	BaseErr BaseErr // File contains error
+	Field   string  // Field name
 }
 
-// OpenModelNilOrEmptyErr error if model parameter nil or empty
-type OpenModelNilOrEmptyErr struct {
-	BaseErr OpenBaseErr // File contains error
-	Model   string      // Model name
+// ModelNilOrEmptyErr error if model parameter nil or empty
+type ModelNilOrEmptyErr struct {
+	BaseErr BaseErr // File contains error
+	Model   string  // Model name
 }
 
-// OpenMinLenErr Error not matching the minimum length
-type OpenMinLenErr struct {
-	BaseErr OpenBaseErr // File contains error
-	Field   string      // Field name
-	MinLen  int         // Minimum password length
+// MinLenErr Error not matching the minimum length
+type MinLenErr struct {
+	BaseErr BaseErr // File contains error
+	Field   string  // Field name
+	MinLen  int     // Minimum password length
 }
 
-// OpenRoleUnknownErr Error throw if role is not contained in list
-type OpenRoleUnknownErr struct {
-	BaseErr OpenBaseErr // File contains error
-	Role    string      // Enter role
-	Roles   []string    // List of available roles
+// RoleUnknownErr Error throw if role is not contained in list
+type RoleUnknownErr struct {
+	BaseErr BaseErr  // File contains error
+	Role    string   // Enter role
+	Roles   []string // List of available roles
 }
 
-// OpenDbErr database errors
-type OpenDbErr struct {
-	BaseErr OpenBaseErr // File contains error
-	DbName  string      // Database's name. Example: mongodb/opencourse
-	ConStr  string      // Connection string
-	DbErr   string      // Database's error
+// DbErr database errors
+type DbErr struct {
+	BaseErr BaseErr // File contains error
+	DbName  string  // Database's name. Example: mongodb/opencourse
+	ConStr  string  // Connection string
+	DbErr   string  // Database's error
 }
 
-// OpenInvalidIdErr convert id error from user string to db object
-type OpenInvalidIdErr struct {
-	Default   OpenDefaultErr // File contains error
-	Id        string         // User id string
-	Converter string         // Converter function
+// InvalidIdErr convert id error from user string to db object
+type InvalidIdErr struct {
+	Default   DefaultErr // File contains error
+	Id        string     // User id string
+	Converter string     // Converter function
 }

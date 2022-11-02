@@ -146,7 +146,7 @@ func TestGetCourses(t *testing.T) {
 		}
 	}
 
-	courses, err := context.GetCourses(10, 0)
+	courses, err := context.GetCourses(getAddCourseQuery().CategoryId, 10, 0)
 
 	if len(courses) < 10 {
 		t.Error(err)

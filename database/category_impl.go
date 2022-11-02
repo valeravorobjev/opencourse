@@ -23,9 +23,9 @@ func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) 
 	cursor, err := col.Find(context.Background(), find)
 
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/category_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
@@ -38,9 +38,9 @@ func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) 
 
 	err = cursor.Decode(dbCategories)
 	if err != nil {
-		return nil, openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/category_impl.go",
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
@@ -55,9 +55,9 @@ func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) 
 		category, err := dbCategory.ToCategory()
 
 		if err != nil {
-			return nil, openerrors.OpenDefaultErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "database/mongodb/category_impl.go",
+			return nil, openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/category_impl.go",
 					Method: "GetCategories",
 				},
 				Msg: err.Error(),
@@ -82,9 +82,9 @@ func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 	result, err := col.InsertOne(context.Background(), category)
 
 	if err != nil {
-		return "", openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/category_impl.go",
+		return "", openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
 				Method: "AddCategory",
 			},
 			DbName: ctx.DbName,
@@ -111,9 +111,9 @@ func (ctx *DbContext) UpdateCategory(categoryId string, name string, lang string
 
 	if err != nil {
 		if err != nil {
-			return openerrors.OpenDefaultErr{
-				BaseErr: openerrors.OpenBaseErr{
-					File:   "database/mongodb/category_impl.go",
+			return openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/category_impl.go",
 					Method: "UpdateCategory",
 				},
 				Msg: err.Error(),
@@ -134,9 +134,9 @@ func (ctx *DbContext) UpdateCategory(categoryId string, name string, lang string
 	_, err = col.UpdateOne(context.Background(), filter, update)
 
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
-				File:   "database/mongodb/category_impl.go",
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
 				Method: "UpdateCategory",
 			},
 			DbName: ctx.DbName,

@@ -25,8 +25,8 @@ func (ctx *DbContext) Connect(uri string) error {
 	ctx.Uri = uri
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/dbcontext.go",
 				Method: "Connect",
 			},
@@ -42,8 +42,8 @@ func (ctx *DbContext) Connect(uri string) error {
 func (ctx *DbContext) Disconnect() error {
 	err := ctx.Client.Disconnect(context.Background())
 	if err != nil {
-		return openerrors.OpenDbErr{
-			BaseErr: openerrors.OpenBaseErr{
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
 				File:   "database/mongodb/dbcontext.go",
 				Method: "Disconnect",
 			},

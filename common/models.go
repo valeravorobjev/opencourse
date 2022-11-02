@@ -1,5 +1,9 @@
 package common
 
+import (
+	"time"
+)
+
 // Open - project prefix
 
 // Languages types
@@ -28,6 +32,12 @@ const (
 const (
 	TestOption  = "option"  // Test with options (variant answers)
 	TestRewrite = "rewrite" // Rewrite test. User need write key text from the question
+)
+
+// Promotion types
+const (
+	PromotionNew    = "new"    // New promotion record
+	PromotionUpdate = "update" // Updated promotion record
 )
 
 // User user common model
@@ -77,15 +87,26 @@ type UpdateCategoryQuery struct {
 
 // Course model
 type Course struct {
-	Id          string   `json:"id"`                    // Course id
-	Name        string   `json:"name"`                  // Course name
-	CategoryId  string   `json:"category_id"`           // Course category
-	Enabled     bool     `json:"enabled"`               // Enabled course
-	Tags        []string `json:"tags"`                  // Course tags
-	Rating      int      `json:"rating"`                // Course rating
-	Description string   `json:"description,omitempty"` // Course description
-	IconImg     string   `json:"icon_img"`              // Icon for category
-	HeaderImg   string   `json:"header_img"`            // Header image
+	Id          string    `json:"id"`                    // Course id
+	Name        string    `json:"name"`                  // Course name
+	CategoryId  string    `json:"category_id"`           // Course category
+	Enabled     bool      `json:"enabled"`               // Enabled course
+	Tags        []string  `json:"tags"`                  // Course tags
+	Rating      int       `json:"rating"`                // Course rating
+	Description string    `json:"description,omitempty"` // Course description
+	IconImg     string    `json:"icon_img"`              // Icon for category
+	HeaderImg   string    `json:"header_img"`            // Header image
+	DateCreate  time.Time `json:"date_create"`           // Date create course
+	DateUpdate  time.Time `json:"date_update"`           // Date update course
+}
+
+// DbCoursePromotion collection
+type DbCoursePromotion struct {
+	Id             string    `json:"id"`              // Course promotion id
+	CourseId       string    `json:"course_id"`       // Course id
+	PromotionType  string    `json:"promotion_type"`  // Promotion type
+	Label          string    `json:"label"`           // Promotion label text
+	ExpirationTime time.Time `json:"expiration_time"` // Promotion expiration time. After this time doc will be removed
 }
 
 // AddCourseQuery add course query
@@ -104,9 +125,18 @@ type PostContent struct {
 }
 
 type Stage struct {
-	Id        string         `json:"id"`         // Stage id
-	CourseId  string         `json:"course_id"`  // Course id. One course has many stages
-	Name      string         `json:"name"`       // Course stage name
-	Contents  []*PostContent `json:"contents"`   // Stage contents
-	HeaderImg string         `json:"header_img"` // Header image
+	Id          string       `json:"id"`           // Stage id
+	CourseId    string       `json:"course_id"`    // Course id. One course has many stages
+	Name        string       `json:"name"`         // Course stage name
+	Content     *PostContent `json:"content"`      // Stage contents
+	HeaderImg   string       `json:"header_img"`   // Header image
+	OrderNumber int          `json:"order_number"` // Stage order number
+}
+
+type AddStageQuery struct {
+	CourseId    string       `json:"course_id"`    // Course id. One course has many stages
+	Name        string       `json:"name"`         // Course stage name
+	Content     *PostContent `json:"content"`      // Stage contents
+	HeaderImg   string       `json:"header_img"`   // Header image
+	OrderNumber int          `json:"order_number"` // Stage order number
 }

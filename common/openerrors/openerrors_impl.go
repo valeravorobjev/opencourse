@@ -5,46 +5,46 @@ import (
 	"strings"
 )
 
-// OpenDefaultErr common error implementation
-func (err OpenBaseErr) Error() string {
+// DefaultErr common error implementation
+func (err BaseErr) Error() string {
 	return fmt.Sprintf("file: %s | method: %s", err.File, err.Method)
 }
 
-// OpenDefaultErr common error implementation
-func (err OpenDefaultErr) Error() string {
+// DefaultErr common error implementation
+func (err DefaultErr) Error() string {
 	return fmt.Sprintf("%s | message: %s", err.BaseErr.Error(), err.Msg)
 }
 
-// OpenFieldEmptyErr implementation
-func (err OpenFieldEmptyErr) Error() string {
+// FieldEmptyErr implementation
+func (err FieldEmptyErr) Error() string {
 	return fmt.Sprintf("%s | message: field %s is empty", err.BaseErr.Error(), err.Field)
 }
 
-// OpenModelNilOrEmptyErr implementation
-func (err OpenModelNilOrEmptyErr) Error() string {
+// ModelNilOrEmptyErr implementation
+func (err ModelNilOrEmptyErr) Error() string {
 	return fmt.Sprintf("%s | message: field %s is empty", err.BaseErr.Error(), err.Model)
 }
 
-// OpenMinLenErr implementation
-func (err OpenMinLenErr) Error() string {
+// MinLenErr implementation
+func (err MinLenErr) Error() string {
 	return fmt.Sprintf("%s | message: field %s length is less than %d",
 		err.BaseErr.Error(), err.Field, err.MinLen)
 }
 
-// OpenRoleUnknownErr implementation
-func (err OpenRoleUnknownErr) Error() string {
+// RoleUnknownErr implementation
+func (err RoleUnknownErr) Error() string {
 	return fmt.Sprintf("%s | message: the role %s is not contained in the list of available roles (%s) ",
 		err.BaseErr.Error(), err.Role, strings.Join(err.Roles, ","))
 }
 
-// OpenDbErr implementation
-func (err OpenDbErr) Error() string {
+// DbErr implementation
+func (err DbErr) Error() string {
 	return fmt.Sprintf("%s | db name: %s | instance: %s | message: %s",
 		err.BaseErr.Error(), err.DbName, err.ConStr, err.DbErr)
 }
 
-// OpenInvalidIdErr implementation
-func (err OpenInvalidIdErr) Error() string {
+// InvalidIdErr implementation
+func (err InvalidIdErr) Error() string {
 	return fmt.Sprintf("%s | user id value: %s | converter: %s",
 		err.Default.Error(), err.Id, err.Converter)
 }
