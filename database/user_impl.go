@@ -130,7 +130,7 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 				Method: "AddUser",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

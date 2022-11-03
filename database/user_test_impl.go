@@ -19,7 +19,7 @@ func (ctx *DbContext) ClearUserTests() error {
 				Method: "ClearUserTests",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

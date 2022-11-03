@@ -2,9 +2,14 @@ module opencourse
 
 go 1.18
 
-require go.mongodb.org/mongo-driver v1.10.1
+require (
+	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/render v1.0.2
+	go.mongodb.org/mongo-driver v1.10.1
+)
 
 require (
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect

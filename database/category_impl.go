@@ -9,15 +9,11 @@ import (
 )
 
 // GetCategories return all categories from db
-func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) {
+func (ctx *DbContext) GetCategories(lang string) ([]*common.Category, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
 	find := bson.D{
-		{"langs", bson.D{
-			{
-				"$in", langs,
-			},
-		}},
+		{"lang", lang},
 	}
 
 	cursor, err := col.Find(context.Background(), find)
@@ -29,7 +25,7 @@ func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) 
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -44,7 +40,7 @@ func (ctx *DbContext) GetCategories(langs []string) ([]*common.Category, error) 
 				Method: "GetCategories",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -88,7 +84,7 @@ func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 				Method: "AddCategory",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -140,7 +136,7 @@ func (ctx *DbContext) UpdateCategory(categoryId string, name string, lang string
 				Method: "UpdateCategory",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

@@ -22,7 +22,7 @@ func (ctx *DbContext) ClearStages() error {
 				Method: "ClearStages",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -66,7 +66,7 @@ func (ctx *DbContext) GetStage(stageId string) (*common.Stage, error) {
 				Method: "GetStage",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -123,7 +123,7 @@ func (ctx *DbContext) GetStages(courseId string, take int64, skip int64) ([]*com
 				Method: "GetStages",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -139,7 +139,7 @@ func (ctx *DbContext) GetStages(courseId string, take int64, skip int64) ([]*com
 				Method: "GetStages",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -253,7 +253,7 @@ func (ctx *DbContext) AddStage(query *common.AddStageQuery) (string, error) {
 				Method: "AddStage",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -374,7 +374,7 @@ func (ctx *DbContext) UpdateStage(query *common.UpdateStageQuery) error {
 				Method: "UpdateStage",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -414,7 +414,7 @@ func (ctx *DbContext) DeleteStage(stageId string) error {
 				Method: "DeleteStage",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

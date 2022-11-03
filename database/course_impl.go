@@ -23,7 +23,7 @@ func (ctx *DbContext) ClearCourses() error {
 				Method: "ClearCourses",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -48,7 +48,7 @@ func (ctx *DbContext) GetCourse(courseId string) (*common.Course, error) {
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -67,7 +67,7 @@ func (ctx *DbContext) GetCourse(courseId string) (*common.Course, error) {
 				Method: "GetCourse",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -130,7 +130,7 @@ func (ctx *DbContext) GetCourses(categoryId string, take int64, skip int64) ([]*
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -146,7 +146,7 @@ func (ctx *DbContext) GetCourses(categoryId string, take int64, skip int64) ([]*
 				Method: "GetCourses",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -192,7 +192,7 @@ func (ctx *DbContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -214,7 +214,7 @@ func (ctx *DbContext) AddCourse(addCourseQuery *common.AddCourseQuery) (string, 
 				Method: "AddCourse",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -241,7 +241,7 @@ func (ctx *DbContext) AddCourseTags(id string, tags []string) error {
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -269,7 +269,7 @@ func (ctx *DbContext) AddCourseTags(id string, tags []string) error {
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -294,7 +294,7 @@ func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -320,7 +320,7 @@ func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 				Method: "AddCourseTags",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

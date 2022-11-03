@@ -22,7 +22,7 @@ func (ctx *DbContext) ClearTests() error {
 				Method: "ClearTests",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -66,7 +66,7 @@ func (ctx *DbContext) GetTest(testId string) (*common.Test, error) {
 				Method: "GetTest",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -123,7 +123,7 @@ func (ctx *DbContext) GetTests(stageId string, take int64, skip int64) ([]*commo
 				Method: "GetTests",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -139,7 +139,7 @@ func (ctx *DbContext) GetTests(stageId string, take int64, skip int64) ([]*commo
 				Method: "GetTests",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -272,7 +272,7 @@ func (ctx *DbContext) AddTest(query *common.AddTestQuery) (string, error) {
 				Method: "AddTest",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}
@@ -313,7 +313,7 @@ func (ctx *DbContext) DeleteTest(testId string) error {
 				Method: "DeleteTest",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 			DbErr:  err.Error(),
 		}
 	}

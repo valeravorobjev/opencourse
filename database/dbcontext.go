@@ -10,20 +10,21 @@ import (
 
 // DbContext is a context for work with mongo db
 type DbContext struct {
-	Uri    string        // Connection string
+	ConStr string        // Connection string
 	DbName string        // Db name. Example: mongodb/opencourse
 	Client *mongo.Client // Client connection for db
 }
 
 // Defaults init values
-func (ctx *DbContext) Defaults() {
+func (ctx *DbContext) Defaults(conStr string) {
+
 	ctx.DbName = fmt.Sprintf("mongodb/%s", DbName)
+	ctx.ConStr = conStr
 }
 
 // Connect to db
-func (ctx *DbContext) Connect(uri string) error {
-	ctx.Uri = uri
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+func (ctx *DbContext) Connect() error {
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(ctx.ConStr))
 	if err != nil {
 		return openerrors.DbErr{
 			BaseErr: openerrors.BaseErr{
@@ -31,7 +32,7 @@ func (ctx *DbContext) Connect(uri string) error {
 				Method: "Connect",
 			},
 			DbName: ctx.DbName,
-			ConStr: uri,
+			ConStr: ctx.ConStr,
 		}
 	}
 	ctx.Client = client
@@ -48,7 +49,7 @@ func (ctx *DbContext) Disconnect() error {
 				Method: "Disconnect",
 			},
 			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
+			ConStr: ctx.ConStr,
 		}
 	}
 

@@ -3,6 +3,7 @@ package integration
 import (
 	"opencourse/common"
 	"opencourse/database"
+	"os"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,7 +16,7 @@ func getContext() *database.DbContext {
 	context := &database.DbContext{}
 
 	// Init default values
-	context.Defaults()
+	context.Defaults(os.Getenv("OPENCOURSE_CON_STR"))
 
 	return context
 }
@@ -33,7 +34,7 @@ func getAddCourseQuery() common.AddCourseQuery {
 func TestMain(m *testing.M) {
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +66,7 @@ func TestAddCourse(t *testing.T) {
 
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +94,7 @@ func TestGetCourse(t *testing.T) {
 
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +127,7 @@ func TestGetCourse(t *testing.T) {
 func TestGetCourses(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,7 +158,7 @@ func TestGetCourses(t *testing.T) {
 func TestAddCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +201,7 @@ func TestAddCourseTags(t *testing.T) {
 func TestRemoveCourseTags(t *testing.T) {
 	context := getContext()
 
-	err := context.Connect(ConnectionString)
+	err := context.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
