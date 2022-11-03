@@ -36,7 +36,7 @@ testId - test id;
 */
 func (ctx *DbContext) GetTest(testId string) (*common.Test, error) {
 
-	col := ctx.Client.Database(DbName).Collection(StageCollection)
+	col := ctx.Client.Database(DbName).Collection(TestsCollection)
 
 	objectTestId, err := primitive.ObjectIDFromHex(testId)
 
@@ -93,7 +93,7 @@ take - how much records take;
 skip - how much records skip;
 */
 func (ctx *DbContext) GetTests(stageId string, take int64, skip int64) ([]*common.TestPreview, error) {
-	col := ctx.Client.Database(DbName).Collection(StageCollection)
+	col := ctx.Client.Database(DbName).Collection(TestsCollection)
 
 	objectStageId, err := primitive.ObjectIDFromHex(stageId)
 
@@ -171,7 +171,7 @@ AddTest return tests. Parameters:
 query - model for create test;
 */
 func (ctx *DbContext) AddTest(query *common.AddTestQuery) (string, error) {
-	col := ctx.Client.Database(DbName).Collection(StageCollection)
+	col := ctx.Client.Database(DbName).Collection(TestsCollection)
 
 	if query.OrderNumber < 0 {
 		return "", openerrors.FieldEmptyErr{
@@ -279,4 +279,44 @@ func (ctx *DbContext) AddTest(query *common.AddTestQuery) (string, error) {
 
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 
+}
+
+/*
+DeleteTest delete test for stage. Parameters:
+testId - test id;
+*/
+func (ctx *DbContext) DeleteTest(testId string) error {
+	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+
+	ojbectTestId, err := primitive.ObjectIDFromHex(testId)
+
+	if err != nil {
+		return openerrors.InvalidIdErr{
+			Id:        testId,
+			Converter: "ObjectIDFromHex",
+			Default: openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/test_impl.go",
+					Method: "DeleteTest",
+				},
+				Msg: err.Error(),
+			},
+		}
+	}
+
+	_, err = col.DeleteOne(context.Background(), bson.D{{"_id", ojbectTestId}})
+
+	if err != nil {
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/test_impl.go",
+				Method: "DeleteTest",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
 }
