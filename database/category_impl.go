@@ -32,7 +32,7 @@ func (ctx *DbContext) GetCategories(lang string) ([]*common.Category, error) {
 
 	var dbCategories []*DbCategory
 
-	err = cursor.Decode(dbCategories)
+	err = cursor.All(context.Background(), &dbCategories)
 	if err != nil {
 		return nil, openerrors.DbErr{
 			BaseErr: openerrors.BaseErr{
@@ -74,6 +74,8 @@ func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 
 	category.Name = addCategoryQuery.Name
 	category.Lang = addCategoryQuery.Lang
+	category.IconImg = addCategoryQuery.IconImg
+	category.HeaderImg = addCategoryQuery.HeaderImg
 
 	result, err := col.InsertOne(context.Background(), category)
 

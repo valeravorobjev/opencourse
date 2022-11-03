@@ -33,7 +33,7 @@ func (ctx *RouteContext) GetCourses(writer http.ResponseWriter, request *http.Re
 	}
 
 	courses, err := ctx.DbContext.GetCourses(categoryId, int64(take), int64(skip))
-	response := &OpenResponse[[]*common.Course]{Data: courses}
+	response := &OpenResponse[[]*common.Course]{Payload: courses}
 
 	err = render.Render(writer, request, response)
 

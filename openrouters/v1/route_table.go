@@ -16,7 +16,8 @@ func RouteTable(dbContext database.DbContext) http.Handler {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Get("/categories", rtx.GetCategories)
+		r.Get("/categories/{lang}", rtx.GetCategories)
+		r.Post("/categories", rtx.PostCategory)
 	})
 
 	return r
