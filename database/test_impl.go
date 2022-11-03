@@ -11,14 +11,14 @@ import (
 
 // ClearTests remove all data from tests collection
 func (ctx *DbContext) ClearTests() error {
-	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+	col := ctx.Client.Database(DbName).Collection(TestCollection)
 
 	_, err := col.DeleteMany(context.Background(), bson.D{{}})
 
 	if err != nil {
 		return openerrors.DbErr{
 			BaseErr: openerrors.BaseErr{
-				File:   "database/stage_impl.go",
+				File:   "database/test_impl.go",
 				Method: "ClearTests",
 			},
 			DbName: ctx.DbName,
@@ -36,7 +36,7 @@ testId - test id;
 */
 func (ctx *DbContext) GetTest(testId string) (*common.Test, error) {
 
-	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+	col := ctx.Client.Database(DbName).Collection(TestCollection)
 
 	objectTestId, err := primitive.ObjectIDFromHex(testId)
 
@@ -93,7 +93,7 @@ take - how much records take;
 skip - how much records skip;
 */
 func (ctx *DbContext) GetTests(stageId string, take int64, skip int64) ([]*common.TestPreview, error) {
-	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+	col := ctx.Client.Database(DbName).Collection(TestCollection)
 
 	objectStageId, err := primitive.ObjectIDFromHex(stageId)
 
@@ -171,7 +171,7 @@ AddTest return tests. Parameters:
 query - model for create test;
 */
 func (ctx *DbContext) AddTest(query *common.AddTestQuery) (string, error) {
-	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+	col := ctx.Client.Database(DbName).Collection(TestCollection)
 
 	if query.OrderNumber < 0 {
 		return "", openerrors.FieldEmptyErr{
@@ -286,7 +286,7 @@ DeleteTest delete test for stage. Parameters:
 testId - test id;
 */
 func (ctx *DbContext) DeleteTest(testId string) error {
-	col := ctx.Client.Database(DbName).Collection(TestsCollection)
+	col := ctx.Client.Database(DbName).Collection(TestCollection)
 
 	ojbectTestId, err := primitive.ObjectIDFromHex(testId)
 
