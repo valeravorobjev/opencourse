@@ -41,14 +41,16 @@ func (ctx *DbContext) GetStage(stageId string) (*common.Stage, error) {
 	objectStageId, err := primitive.ObjectIDFromHex(stageId)
 
 	if err != nil {
-		return nil, openerrors.DbErr{
-			BaseErr: openerrors.BaseErr{
-				File:   "database/stage_impl.go",
-				Method: "GetStage",
+		return nil, openerrors.InvalidIdErr{
+			Id:        stageId,
+			Converter: "ObjectIDFromHex",
+			Default: openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/stage_impl.go",
+					Method: "GetStage",
+				},
+				Msg: err.Error(),
 			},
-			DbName: ctx.DbName,
-			ConStr: ctx.Uri,
-			DbErr:  err.Error(),
 		}
 	}
 

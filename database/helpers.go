@@ -116,3 +116,70 @@ func (dbStage *DbStage) ToStagePreview() (*common.StagePreview, error) {
 
 	return &stage, nil
 }
+
+/*
+ToTest map DbTest to Test
+*/
+func (dbTest *DbTest) ToTest() (*common.Test, error) {
+	if dbTest == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToTest",
+			},
+			Model: "dbTest",
+		}
+	}
+
+	var test common.Test
+
+	test.Id = dbTest.Id.Hex()
+	test.StageId = dbTest.StageId.Hex()
+	test.TestType = dbTest.TestType
+	test.LemmingsCount = dbTest.LemmingsCount
+	test.OrderNumber = dbTest.OrderNumber
+
+	if dbTest.OptionTest != nil {
+		test.OptionTest = &common.OptionTest{}
+		test.OptionTest.Question = dbTest.OptionTest.Question
+
+		for _, dbOption := range dbTest.OptionTest.Options {
+			test.OptionTest.Options =
+				append(test.OptionTest.Options, &common.Option{Answer: dbOption.Answer, IsRight: dbOption.IsRight})
+		}
+	}
+
+	if dbTest.RewriteTest != nil {
+		test.RewriteTest = &common.RewriteTest{
+			Question:    dbTest.RewriteTest.Question,
+			RightAnswer: dbTest.RewriteTest.RightAnswer,
+		}
+	}
+
+	return &test, nil
+}
+
+/*
+ToTestPreview map DbTest to TestPreview
+*/
+func (dbTest *DbTest) ToTestPreview() (*common.TestPreview, error) {
+	if dbTest == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToTestPreview",
+			},
+			Model: "dbTest",
+		}
+	}
+
+	var test common.TestPreview
+
+	test.Id = dbTest.Id.Hex()
+	test.StageId = dbTest.StageId.Hex()
+	test.TestType = dbTest.TestType
+	test.LemmingsCount = dbTest.LemmingsCount
+	test.OrderNumber = dbTest.OrderNumber
+
+	return &test, nil
+}

@@ -23,14 +23,14 @@ type DbCredential struct {
 	UpTime           primitive.DateTime `bson:"uptime"`            // User uptime
 }
 
-type Option struct {
+type DbOption struct {
 	Answer  string `bson:"answer"`
 	IsRight bool   `bson:"is_right"`
 }
 
 type DbOptionTest struct {
-	Question string    `bson:"question"`
-	Options  []*Option `bson:"options"`
+	Question string      `bson:"question"`
+	Options  []*DbOption `bson:"options"`
 }
 
 type DbRewriteTest struct {

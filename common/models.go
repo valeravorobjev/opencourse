@@ -157,3 +157,36 @@ type UpdateStageQuery struct {
 	HeaderImg   string       `json:"header_img"`   // Header image
 	OrderNumber int          `json:"order_number"` // Stage order number
 }
+
+type Test struct {
+	Id            string       `json:"_id,omitempty"`          // Test id
+	StageId       string       `json:"stage_id"`               // Stage id
+	TestType      string       `json:"test_type"`              // Test type
+	LemmingsCount int          `json:"lemmings_count"`         // Count of lemmings for passed test
+	OptionTest    *OptionTest  `json:"option_test,omitempty"`  // Option test. Test with option variant answers. Optional
+	RewriteTest   *RewriteTest `json:"rewrite_test,omitempty"` // Rewrite test. Test with phrase how need write. Optional
+	OrderNumber   int          `json:"order_number"`           // Test order number
+}
+
+type TestPreview struct {
+	Id            string `json:"_id,omitempty"`  // Test id
+	StageId       string `json:"stage_id"`       // Stage id
+	TestType      string `json:"test_type"`      // Test type
+	LemmingsCount int    `json:"lemmings_count"` // Count of lemmings for passed test
+	OrderNumber   int    `json:"order_number"`   // Test order number
+}
+
+type Option struct {
+	Answer  string `json:"answer"`
+	IsRight bool   `json:"is_right"`
+}
+
+type OptionTest struct {
+	Question string    `json:"question"`
+	Options  []*Option `json:"options"`
+}
+
+type RewriteTest struct {
+	Question    string `json:"question"`
+	RightAnswer bool   `json:"right_answer"`
+}
