@@ -35,5 +35,5 @@ type DbOptionTest struct {
 
 type DbRewriteTest struct {
 	Question    string `bson:"question"`
-	RightAnswer bool   `bson:"right_answer"`
+	RightAnswer string `bson:"right_answer"`
 }

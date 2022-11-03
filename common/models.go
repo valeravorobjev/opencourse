@@ -188,5 +188,14 @@ type OptionTest struct {
 
 type RewriteTest struct {
 	Question    string `json:"question"`
-	RightAnswer bool   `json:"right_answer"`
+	RightAnswer string `json:"right_answer"`
+}
+
+type AddTestQuery struct {
+	StageId       string       `json:"stage_id"`               // Stage id
+	TestType      string       `json:"test_type"`              // Test type
+	LemmingsCount int          `json:"lemmings_count"`         // Count of lemmings for passed test
+	OptionTest    *OptionTest  `json:"option_test,omitempty"`  // Option test. Test with option variant answers. Optional
+	RewriteTest   *RewriteTest `json:"rewrite_test,omitempty"` // Rewrite test. Test with phrase how need write. Optional
+	OrderNumber   int          `json:"order_number"`           // Test order number
 }

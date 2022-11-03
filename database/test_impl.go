@@ -165,3 +165,118 @@ func (ctx *DbContext) GetTests(stageId string, take int64, skip int64) ([]*commo
 
 	return tests, nil
 }
+
+/*
+AddTest return tests. Parameters:
+query - model for create test;
+*/
+func (ctx *DbContext) AddTest(query *common.AddTestQuery) (string, error) {
+	col := ctx.Client.Database(DbName).Collection(StageCollection)
+
+	if query.OrderNumber < 0 {
+		return "", openerrors.FieldEmptyErr{
+			Field: "query.OrderNumber",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/test_impl.go",
+				Method: "AddTest",
+			},
+		}
+	}
+
+	if len(query.TestType) < 2 {
+		return "", openerrors.FieldEmptyErr{
+			Field: "query.TestType",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/test_impl.go",
+				Method: "AddTest",
+			},
+		}
+	}
+
+	if query.LemmingsCount < 1 {
+		return "", openerrors.FieldEmptyErr{
+			Field: "query.LemmingsCount",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/test_impl.go",
+				Method: "AddTest",
+			},
+		}
+	}
+
+	objectStageId, err := primitive.ObjectIDFromHex(query.StageId)
+
+	if err != nil {
+		return "", openerrors.InvalidIdErr{
+			Id:        query.StageId,
+			Converter: "ObjectIDFromHex",
+			Default: openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/test_impl.go",
+					Method: "AddTest",
+				},
+				Msg: err.Error(),
+			},
+		}
+	}
+
+	var dbTest DbTest
+
+	dbTest.StageId = objectStageId
+	dbTest.TestType = query.TestType
+	dbTest.LemmingsCount = query.LemmingsCount
+	dbTest.OrderNumber = query.OrderNumber
+
+	if query.TestType == common.TestOption {
+
+		if query.OptionTest == nil {
+			return "", openerrors.FieldEmptyErr{
+				Field: "query.OptionTest",
+				BaseErr: openerrors.BaseErr{
+					File:   "database/test_impl.go",
+					Method: "AddTest",
+				},
+			}
+		}
+
+		dbTest.OptionTest = &DbOptionTest{}
+		dbTest.OptionTest.Question = query.OptionTest.Question
+		for _, option := range query.OptionTest.Options {
+			dbTest.OptionTest.Options =
+				append(dbTest.OptionTest.Options, &DbOption{Answer: option.Answer, IsRight: option.IsRight})
+		}
+	}
+
+	if query.TestType == common.TestRewrite {
+
+		if query.RewriteTest == nil {
+			return "", openerrors.FieldEmptyErr{
+				Field: "query.RewriteTest",
+				BaseErr: openerrors.BaseErr{
+					File:   "database/test_impl.go",
+					Method: "AddTest",
+				},
+			}
+		}
+
+		dbTest.RewriteTest = &DbRewriteTest{}
+		dbTest.RewriteTest.Question = query.RewriteTest.Question
+		dbTest.RewriteTest.RightAnswer = query.RewriteTest.RightAnswer
+	}
+
+	result, err := col.InsertOne(context.Background(), dbTest)
+
+	if err != nil {
+		return "", openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/test_impl.go",
+				Method: "AddTest",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.Uri,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+
+}
