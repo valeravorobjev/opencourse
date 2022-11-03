@@ -91,3 +91,28 @@ func (dbStage *DbStage) ToStage() (*common.Stage, error) {
 
 	return &stage, nil
 }
+
+/*
+ToStagePreview map DbStage to StagePreview
+*/
+func (dbStage *DbStage) ToStagePreview() (*common.StagePreview, error) {
+	if dbStage == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToStagePreview",
+			},
+			Model: "dbStage",
+		}
+	}
+
+	var stage common.StagePreview
+
+	stage.Id = dbStage.Id.Hex()
+	stage.Name = dbStage.Name
+	stage.CourseId = dbStage.CourseId.Hex()
+	stage.HeaderImg = dbStage.HeaderImg
+	stage.OrderNumber = dbStage.OrderNumber
+
+	return &stage, nil
+}

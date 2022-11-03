@@ -133,7 +133,24 @@ type Stage struct {
 	OrderNumber int          `json:"order_number"` // Stage order number
 }
 
+type StagePreview struct {
+	Id          string `json:"id"`           // Stage id
+	CourseId    string `json:"course_id"`    // Course id. One course has many stages
+	Name        string `json:"name"`         // Course stage name
+	HeaderImg   string `json:"header_img"`   // Header image
+	OrderNumber int    `json:"order_number"` // Stage order number
+}
+
 type AddStageQuery struct {
+	CourseId    string       `json:"course_id"`    // Course id. One course has many stages
+	Name        string       `json:"name"`         // Course stage name
+	Content     *PostContent `json:"content"`      // Stage contents
+	HeaderImg   string       `json:"header_img"`   // Header image
+	OrderNumber int          `json:"order_number"` // Stage order number
+}
+
+type UpdateStageQuery struct {
+	StageId     string       `json:"stage_id"`     // Stage id
 	CourseId    string       `json:"course_id"`    // Course id. One course has many stages
 	Name        string       `json:"name"`         // Course stage name
 	Content     *PostContent `json:"content"`      // Stage contents
