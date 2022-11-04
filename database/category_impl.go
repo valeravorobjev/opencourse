@@ -72,6 +72,46 @@ func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 
 	category := DbCategory{}
 
+	if len(addCategoryQuery.Name) < 2 {
+		return "", openerrors.FieldEmptyErr{
+			Field: addCategoryQuery.Name,
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
+				Method: "AddCategory",
+			},
+		}
+	}
+
+	if len(addCategoryQuery.Lang) < 1 {
+		return "", openerrors.FieldEmptyErr{
+			Field: addCategoryQuery.Lang,
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
+				Method: "AddCategory",
+			},
+		}
+	}
+
+	if len(addCategoryQuery.IconImg) < 1 {
+		return "", openerrors.FieldEmptyErr{
+			Field: addCategoryQuery.IconImg,
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
+				Method: "AddCategory",
+			},
+		}
+	}
+
+	if len(addCategoryQuery.HeaderImg) < 1 {
+		return "", openerrors.FieldEmptyErr{
+			Field: addCategoryQuery.HeaderImg,
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
+				Method: "AddCategory",
+			},
+		}
+	}
+
 	category.Name = addCategoryQuery.Name
 	category.Lang = addCategoryQuery.Lang
 	category.IconImg = addCategoryQuery.IconImg
