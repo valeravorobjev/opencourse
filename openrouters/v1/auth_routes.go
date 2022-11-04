@@ -13,18 +13,18 @@ func (ctx *RouteContext) Login(writer http.ResponseWriter, request *http.Request
 
 	err := render.Bind(request, openRequest)
 	if err != nil {
-		WriteErrResponse[string](writer, request, "invalid model", 400)
+		WriteErrResponse(writer, request, err, "invalid model", 400)
 		return
 	}
 
 	_, tokenString, err := ctx.TokenAuth.Encode(
 		map[string]interface{}{
 			"login": openRequest.Payload.Login,
-			"exp":   time.Now().Add(time.Minute * 5).Unix(),
+			"exp":   time.Now().Add(time.Minute * 60).Unix(),
 		})
 
 	if err != nil {
-		WriteErrResponse[string](writer, request, "create token error", 400)
+		WriteErrResponse(writer, request, err, "create token error", 400)
 		return
 	}
 

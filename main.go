@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httplog"
 	"github.com/go-chi/jwtauth/v5"
 	"net/http"
 	"opencourse/database"
@@ -12,7 +13,6 @@ import (
 
 func main() {
 
-	// Get secrets
 	conStr := os.Getenv("OPENCOURSE_CON_STR")
 	sign := os.Getenv("OPENCOURSE_SIGN")
 
@@ -33,17 +33,22 @@ func main() {
 		}
 	}()
 
+	logger := httplog.NewLogger("openlog", httplog.Options{
+		JSON:    true,
+		Concise: true,
+	})
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
+	r.Use(httplog.RequestLogger(logger))
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/ping"))
 
 	r.Mount("/v1", v1.RouteTable(dbContext, tokenAuth))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Welcome to OpenCourses REST API"))
-
 	})
 
 	_ = http.ListenAndServe(":3000", r)

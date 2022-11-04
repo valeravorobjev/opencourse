@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/go-chi/httplog"
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-chi/render"
 	"net/http"
@@ -40,14 +41,16 @@ func WriteResponse[T any](writer http.ResponseWriter, request *http.Request, pay
 	}
 }
 
-func WriteErrResponse[T any](writer http.ResponseWriter, request *http.Request, msg string, httpStatus int) {
+func WriteErrResponse(writer http.ResponseWriter, request *http.Request, err error, msg string, httpStatus int) {
 
-	response := OpenResponse[T]{Error: msg}
+	httplog.LogEntrySetField(request.Context(), "err", err.Error())
+	response := OpenResponse[string]{Error: msg}
 
 	render.Status(request, httpStatus)
-	err := render.Render(writer, request, &response)
+	err = render.Render(writer, request, &response)
 
 	if err != nil {
 		writer.WriteHeader(500)
+		httplog.LogEntrySetField(request.Context(), "err", err.Error())
 	}
 }

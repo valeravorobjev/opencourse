@@ -14,7 +14,7 @@ func (ctx *RouteContext) GetCategories(writer http.ResponseWriter, request *http
 	categories, err := ctx.DbContext.GetCategories(lang)
 
 	if err != nil {
-		WriteErrResponse[[]*common.Category](writer, request, "can't get categories", 400)
+		WriteErrResponse(writer, request, err, "can't get categories", 400)
 		return
 	}
 
@@ -28,14 +28,14 @@ func (ctx *RouteContext) PostCategory(writer http.ResponseWriter, request *http.
 	err := render.Bind(request, openRequest)
 
 	if err != nil {
-		WriteErrResponse[string](writer, request, "invalid model", 400)
+		WriteErrResponse(writer, request, err, "invalid model", 400)
 		return
 	}
 
 	categoryId, err := ctx.DbContext.AddCategory(&openRequest.Payload)
 
 	if err != nil {
-		WriteErrResponse[string](writer, request, "can't create category", 400)
+		WriteErrResponse(writer, request, err, "can't create category", 400)
 		return
 	}
 

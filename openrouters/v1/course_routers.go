@@ -19,21 +19,21 @@ func (ctx *RouteContext) GetCourses(writer http.ResponseWriter, request *http.Re
 
 	if urlValues.Has("take") {
 		take, err = strconv.Atoi(urlValues.Get("take"))
-		WriteErrResponse[string](writer, request, "wrong take parameter", 400)
+		WriteErrResponse(writer, request, err, "wrong take parameter", 400)
 		return
 	}
 
 	if urlValues.Has("skip") {
 		skip, err = strconv.Atoi(urlValues.Get("skip"))
 
-		WriteErrResponse[string](writer, request, "wrong skip parameter", 400)
+		WriteErrResponse(writer, request, err, "wrong skip parameter", 400)
 		return
 	}
 
 	courses, err := ctx.DbContext.GetCourses(categoryId, int64(take), int64(skip))
 
 	if err != nil {
-		WriteErrResponse[[]*common.Course](writer, request, "can't get courses", 400)
+		WriteErrResponse(writer, request, err, "can't get courses", 400)
 		return
 	}
 
