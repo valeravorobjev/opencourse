@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 	"net/http"
 	"opencourse/common"
 	"strconv"
@@ -20,24 +19,23 @@ func (ctx *RouteContext) GetCourses(writer http.ResponseWriter, request *http.Re
 
 	if urlValues.Has("take") {
 		take, err = strconv.Atoi(urlValues.Get("take"))
-		if err != nil {
-			writer.WriteHeader(400)
-		}
+		WriteErrResponse[string](writer, request, "wrong take parameter", 400)
+		return
 	}
 
 	if urlValues.Has("skip") {
 		skip, err = strconv.Atoi(urlValues.Get("skip"))
-		if err != nil {
-			writer.WriteHeader(400)
-		}
+
+		WriteErrResponse[string](writer, request, "wrong skip parameter", 400)
+		return
 	}
 
 	courses, err := ctx.DbContext.GetCourses(categoryId, int64(take), int64(skip))
-	response := &OpenResponse[[]*common.Course]{Payload: courses}
-
-	err = render.Render(writer, request, response)
 
 	if err != nil {
-		writer.WriteHeader(400)
+		WriteErrResponse[[]*common.Course](writer, request, "can't get courses", 400)
+		return
 	}
+
+	WriteResponse[[]*common.Course](writer, request, &courses)
 }
