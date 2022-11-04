@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth/v5"
 	"net/http"
 	"opencourse/database"
 	v1 "opencourse/openrouters/v1"
@@ -11,8 +12,14 @@ import (
 
 func main() {
 
+	// Get secrets
+	conStr := os.Getenv("OPENCOURSE_CON_STR")
+	sign := os.Getenv("OPENCOURSE_SIGN")
+
 	dbContext := database.DbContext{}
-	dbContext.Defaults(os.Getenv("OPENCOURSE_CON_STR"))
+	dbContext.Defaults(conStr)
+
+	tokenAuth := jwtauth.New("HS256", []byte(sign), nil)
 
 	err := dbContext.Connect()
 	if err != nil {
@@ -32,7 +39,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Mount("/v1", v1.RouteTable(dbContext))
+	r.Mount("/v1", v1.RouteTable(dbContext, tokenAuth))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Welcome to OpenCourses REST API"))

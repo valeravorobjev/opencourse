@@ -199,3 +199,8 @@ type AddTestQuery struct {
 	RewriteTest   *RewriteTest `json:"rewrite_test,omitempty"` // Rewrite test. Test with phrase how need write. Optional
 	OrderNumber   int          `json:"order_number"`           // Test order number
 }
+
+type LoginQuery struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}

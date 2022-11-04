@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-chi/render"
 	"net/http"
 	"opencourse/database"
@@ -8,6 +9,7 @@ import (
 
 type RouteContext struct {
 	DbContext database.DbContext
+	TokenAuth *jwtauth.JWTAuth
 }
 
 type OpenResponse[T any] struct {
