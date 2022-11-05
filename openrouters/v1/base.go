@@ -43,7 +43,10 @@ func WriteResponse[T any](writer http.ResponseWriter, request *http.Request, pay
 
 func WriteErrResponse(writer http.ResponseWriter, request *http.Request, err error, msg string, httpStatus int) {
 
-	httplog.LogEntrySetField(request.Context(), "err", err.Error())
+	if err != nil {
+		httplog.LogEntrySetField(request.Context(), "err", err.Error())
+	}
+
 	response := OpenResponse[string]{Error: msg}
 
 	render.Status(request, httpStatus)

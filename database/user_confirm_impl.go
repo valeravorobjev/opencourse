@@ -2,10 +2,13 @@ package database
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"opencourse/common"
 	"opencourse/common/openerrors"
+	"time"
 )
 
 // ClearUserConfirms remove all data from user_confirms collection
@@ -130,6 +133,10 @@ func (ctx *DbContext) SetConfirmed(userConfirmId string) error {
 	return nil
 }
 
+/*
+GetUserConfirmByLogin return confirm data for user by login. Parameters:
+login - user login;
+*/
 func (ctx *DbContext) GetUserConfirmByLogin(login string) (*common.UserConfirm, error) {
 	col := ctx.Client.Database(DbName).Collection(UserConfirmCollection)
 
@@ -174,4 +181,110 @@ func (ctx *DbContext) GetUserConfirmByLogin(login string) (*common.UserConfirm, 
 
 	return userConfirm, nil
 
+}
+
+/*
+AddUserConfirm add user confirm. Parameters:
+query - RegisterQuery model;
+*/
+func (ctx *DbContext) AddUserConfirm(query *common.RegisterQuery) (*common.UserConfirm, error) {
+	col := ctx.Client.Database(DbName).Collection(UserConfirmCollection)
+
+	if query == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			Model: "addCategoryQuery",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/user_confirm_impl.go",
+				Method: "AddUserConfirm",
+			},
+		}
+	}
+
+	var dbUserConfirm DbUserConfirm
+
+	dbUserConfirm.ExpirationTime = primitive.NewDateTimeFromTime(time.Now().UTC().Add(time.Hour * 48))
+	dbUserConfirm.Login = query.Login
+	dbUserConfirm.Password = query.Password
+	dbUserConfirm.Name = query.Name
+	dbUserConfirm.Avatar = query.Avatar
+	dbUserConfirm.Email = query.Email
+	dbUserConfirm.Confirmed = false
+
+	key := fmt.Sprintf("%s %s %s", dbUserConfirm.Login, dbUserConfirm.Email, dbUserConfirm.Password)
+	h := sha256.New()
+	h.Write([]byte(key))
+
+	code := string(h.Sum(nil))
+
+	dbUserConfirm.ConfirmaCode = code
+
+	result, err := col.InsertOne(context.Background(), dbUserConfirm)
+
+	if err != nil {
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/user_confirm_impl.go",
+				Method: "AddUserConfirm",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.ConStr,
+			DbErr:  err.Error(),
+		}
+	}
+
+	dbUserConfirm.Id = result.InsertedID.(primitive.ObjectID)
+
+	userConfirm, err := dbUserConfirm.ToUserConfirm()
+
+	if err != nil {
+		return nil, openerrors.DefaultErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/user_confirm_impl.go",
+				Method: "AddUserConfirm",
+			},
+			Msg: err.Error(),
+		}
+	}
+
+	return userConfirm, nil
+}
+
+/*
+DeleteUserConfirm delete userConfirm. Parameters:
+userConfirmId - user confirm id;
+*/
+func (ctx *DbContext) DeleteUserConfirm(userConfirmId string) error {
+	col := ctx.Client.Database(DbName).Collection(UserConfirmCollection)
+
+	objectUserConfirmId, err := primitive.ObjectIDFromHex(userConfirmId)
+
+	if err != nil {
+		return openerrors.InvalidIdErr{
+			Id:        userConfirmId,
+			Converter: "ObjectIDFromHex",
+			Default: openerrors.DefaultErr{
+				BaseErr: openerrors.BaseErr{
+					File:   "database/user_confirm_impl.go",
+					Method: "DeleteUserConfirm",
+				},
+				Msg: err.Error(),
+			},
+		}
+	}
+
+	_, err = col.DeleteOne(context.Background(), bson.D{{"_id", objectUserConfirmId}})
+
+	if err != nil {
+		return openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/user_confirm_impl.go",
+				Method: "DeleteUserConfirm",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.ConStr,
+			DbErr:  err.Error(),
+		}
+	}
+
+	return nil
 }

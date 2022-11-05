@@ -70,7 +70,15 @@ func (ctx *DbContext) GetCategories(lang string) ([]*common.Category, error) {
 func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (string, error) {
 	col := ctx.Client.Database(DbName).Collection(CategoryCollection)
 
-	category := DbCategory{}
+	if addCategoryQuery == nil {
+		return "", openerrors.ModelNilOrEmptyErr{
+			Model: "addCategoryQuery",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/category_impl.go",
+				Method: "AddCategory",
+			},
+		}
+	}
 
 	if len(addCategoryQuery.Name) < 2 {
 		return "", openerrors.FieldEmptyErr{
@@ -111,6 +119,8 @@ func (ctx *DbContext) AddCategory(addCategoryQuery *common.AddCategoryQuery) (st
 			},
 		}
 	}
+
+	category := DbCategory{}
 
 	category.Name = addCategoryQuery.Name
 	category.Lang = addCategoryQuery.Lang

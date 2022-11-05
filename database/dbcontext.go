@@ -10,15 +10,21 @@ import (
 
 // DbContext is a context for work with mongo db
 type DbContext struct {
-	ConStr string        // Connection string
-	DbName string        // Db name. Example: mongodb/opencourse
-	Client *mongo.Client // Client connection for db
+	ConStr          string        // Connection string
+	DbName          string        // Db name. Example: mongodb/opencourse
+	SmtpAccount     string        // SMTP account
+	SmtpAccountPass string        // SMTP account password
+	Endpoint        string        // Endpoint (base url)
+	Client          *mongo.Client // Client connection for db
 }
 
 // Defaults init values
-func (ctx *DbContext) Defaults(conStr string) {
+func (ctx *DbContext) Defaults(conStr string, smtpAccount string, smtpPass string, endpoint string) {
 
 	ctx.DbName = fmt.Sprintf("mongodb/%s", DbName)
+	ctx.SmtpAccountPass = smtpPass
+	ctx.SmtpAccount = smtpAccount
+	ctx.Endpoint = endpoint
 	ctx.ConStr = conStr
 }
 

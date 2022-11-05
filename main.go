@@ -13,11 +13,15 @@ import (
 
 func main() {
 
+	// Loading environments
 	conStr := os.Getenv("OPENCOURSE_CON_STR")
 	sign := os.Getenv("OPENCOURSE_SIGN")
+	smtpAccount := os.Getenv("OPENCOURSE_SMTP_ACCOUNT")
+	smtpAccountPass := os.Getenv("OPENCOURSE_SMTP_ACCOUNT_PASS")
+	baseEndpoint := os.Getenv("OPENCOURSE_ENDPOINT")
 
 	dbContext := database.DbContext{}
-	dbContext.Defaults(conStr)
+	dbContext.Defaults(conStr, smtpAccount, smtpAccountPass, baseEndpoint)
 
 	tokenAuth := jwtauth.New("HS256", []byte(sign), nil)
 
