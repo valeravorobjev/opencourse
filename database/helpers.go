@@ -183,3 +183,92 @@ func (dbTest *DbTest) ToTestPreview() (*common.TestPreview, error) {
 
 	return &test, nil
 }
+
+/*
+ToUserConfirm map DbUserConfirm to UserConfirm
+*/
+func (dbUserConfirm *DbUserConfirm) ToUserConfirm() (*common.UserConfirm, error) {
+	if dbUserConfirm == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToUserConfirm",
+			},
+			Model: "dbUserConfirm",
+		}
+	}
+
+	var userConfirm common.UserConfirm
+
+	userConfirm.Id = dbUserConfirm.Id.Hex()
+	userConfirm.ExpirationTime = dbUserConfirm.ExpirationTime.Time()
+	userConfirm.Login = dbUserConfirm.Login
+	userConfirm.Password = dbUserConfirm.Password
+	userConfirm.Name = dbUserConfirm.Name
+	userConfirm.Email = dbUserConfirm.Email
+	userConfirm.Avatar = dbUserConfirm.Avatar
+	userConfirm.ConfirmaCode = dbUserConfirm.ConfirmaCode
+	userConfirm.Confirmed = dbUserConfirm.Confirmed
+
+	return &userConfirm, nil
+}
+
+/*
+ToUser map DbUser to User
+*/
+func (dbUser *DbUser) ToUser() (*common.User, error) {
+	if dbUser == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToUser",
+			},
+			Model: "dbUser",
+		}
+	}
+
+	var user common.User
+
+	user.Id = dbUser.Id.Hex()
+	user.Name = dbUser.Name
+	user.Avatar = dbUser.Avatar
+	user.Email = dbUser.Email
+	user.Rating = dbUser.Rating
+	user.Credential = &common.Credential{
+		Login:            dbUser.Credential.Login,
+		Password:         dbUser.Credential.Password,
+		Salt:             dbUser.Credential.Salt,
+		Roles:            dbUser.Credential.Roles,
+		IsActive:         dbUser.Credential.IsActive,
+		DateRegistration: dbUser.Credential.DateRegistration.Time(),
+		UpTime:           dbUser.Credential.UpTime.Time(),
+	}
+
+	return &user, nil
+}
+
+/*
+ToUserPreview map User to UserPreview
+*/
+func ToUserPreview(user *common.User) (*common.UserPreview, error) {
+	if user == nil {
+		return nil, openerrors.ModelNilOrEmptyErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/helpers.go",
+				Method: "ToUserPreview",
+			},
+			Model: "dbUser",
+		}
+	}
+
+	var userPreview common.UserPreview
+
+	userPreview.Id = user.Id
+	userPreview.Login = user.Credential.Login
+	userPreview.Name = user.Name
+	userPreview.Rating = user.Rating
+	userPreview.Roles = user.Credential.Roles
+	userPreview.Avatar = user.Avatar
+
+	return &userPreview, nil
+}

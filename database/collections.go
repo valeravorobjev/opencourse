@@ -17,6 +17,19 @@ type DbUser struct {
 	Email      string             `bson:"email"`         // User email address
 }
 
+// DbUserConfirm collection
+type DbUserConfirm struct {
+	Id             primitive.ObjectID `bson:"_id,omitempty"`    // User id
+	ExpirationTime primitive.DateTime `bson:"expiration_time"`  // Expiration time for auto remove
+	Login          string             `bson:"login"`            // User login
+	Password       string             `bson:"password"`         // User password
+	Name           string             `bson:"name"`             // User display name
+	Email          string             `bson:"email"`            // Email user address
+	Avatar         string             `bson:"avatar,omitempty"` // User avatar image path
+	ConfirmaCode   string             `bson:"confirm_code"`     // Confirmation code for registration
+	Confirmed      bool               `bson:"confirmed"`        // Confirmed if true
+}
+
 // DbCategory of curses collection
 type DbCategory struct {
 	Id        primitive.ObjectID `bson:"_id,omitempty"` // Category id

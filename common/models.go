@@ -40,8 +40,8 @@ const (
 	PromotionUpdate = "update" // Updated promotion record
 )
 
-// User user common model
-type User struct {
+// UserPreview user preview model for client
+type UserPreview struct {
 	Id     string   `json:"id"`     // User id
 	Login  string   `json:"login"`  // User login
 	Name   string   `json:"name"`   // User display name
@@ -49,6 +49,26 @@ type User struct {
 	Avatar string   `json:"avatar"` // User avatar image path
 	Rating int      `json:"rating"` // User rating
 	Roles  []string `json:"roles"`  // User roles
+}
+
+// User model
+type User struct {
+	Id         string      `json:"id"`         // User id
+	Name       string      `json:"name"`       // User name
+	Avatar     string      `json:"avatar"`     // Avatar image path
+	Credential *Credential `json:"credential"` // User credential properties
+	Rating     int         `json:"rating"`     // User rating
+	Email      string      `json:"email"`      // User email address
+}
+
+type Credential struct {
+	Login            string    `json:"login"`             // User login
+	Password         string    `json:"password"`          // User password
+	Salt             int       `json:"salt"`              // Salt for generate password
+	Roles            []string  `json:"roles"`             // User roles
+	IsActive         bool      `json:"is_active"`         // Is user active or not
+	DateRegistration time.Time `json:"date_registration"` // User registration date
+	UpTime           time.Time `json:"uptime"`            // User uptime
 }
 
 // AddUserQuery model for create user
@@ -203,4 +223,24 @@ type AddTestQuery struct {
 type LoginQuery struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+}
+
+type RegisterQuery struct {
+	Login    string `json:"login"`    // User login
+	Password string `json:"password"` // User password
+	Name     string `json:"name"`     // User display name
+	Email    string `json:"email"`    // Email user address
+	Avatar   string `json:"avatar"`   // User avatar image path
+}
+
+type UserConfirm struct {
+	Id             string    `json:"_id,omitempty"`    // User id
+	ExpirationTime time.Time `json:"expiration_time"`  // Expiration time for auto remove
+	Login          string    `json:"login"`            // User login
+	Password       string    `json:"password"`         // User password
+	Name           string    `json:"name"`             // User display name
+	Email          string    `json:"email"`            // Email user address
+	Avatar         string    `json:"avatar,omitempty"` // User avatar image path
+	ConfirmaCode   string    `json:"confirm_code"`     // Confirmation code for registration
+	Confirmed      bool      `json:"confirmed"`        // Confirmed if true
 }

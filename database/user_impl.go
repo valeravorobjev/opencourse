@@ -5,7 +5,9 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
 	"opencourse/common"
 	"opencourse/common/openerrors"
@@ -138,4 +140,59 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	id := result.InsertedID.(primitive.ObjectID)
 
 	return id.Hex(), nil
+}
+
+/*
+GetUserByLogin return user by login. Parameters:
+login - user login;
+*/
+func (ctx *DbContext) GetUserByLogin(login string) (*common.User, error) {
+	col := ctx.Client.Database(DbName).Collection(UserCollection)
+
+	if len(login) < 1 {
+		return nil, openerrors.FieldEmptyErr{
+			Field: "login",
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/user_impl.go",
+				Method: "GetUserByLogin",
+			},
+		}
+	}
+
+	find := bson.D{{
+		"login", login,
+	}}
+
+	var dbUser DbUser
+	err := col.FindOne(context.Background(), find).Decode(&dbUser)
+
+	if err != nil && err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, openerrors.DbErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/user_impl.go",
+				Method: "GetUserByLogin",
+			},
+			DbName: ctx.DbName,
+			ConStr: ctx.ConStr,
+			DbErr:  err.Error(),
+		}
+	}
+
+	user, err := dbUser.ToUser()
+
+	if err != nil {
+		return nil, openerrors.DefaultErr{
+			BaseErr: openerrors.BaseErr{
+				File:   "database/mongodb/user_impl.go",
+				Method: "GetUserByLogin",
+			},
+			Msg: err.Error(),
+		}
+	}
+
+	return user, nil
 }
