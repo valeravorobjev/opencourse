@@ -84,8 +84,6 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	//TODO: add email send
-
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", "confirm@opencourse.com")
 	msg.SetHeader("To", userConfirm.Email)
