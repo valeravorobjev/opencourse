@@ -24,7 +24,7 @@ func RouteTable(dbContext database.DbContext, tokenAuth *jwtauth.JWTAuth) http.H
 	r.Group(func(r chi.Router) {
 		r.Post("/auth/login", rtx.Login)
 		r.Post("/auth/register", rtx.Register)
-		r.Get("/auth/confirm/{code}", nil)
+		r.Get("/auth/confirm/{id}/{code}", rtx.Confirm)
 	})
 
 	return r

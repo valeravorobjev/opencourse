@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"gopkg.in/gomail.v2"
 	"net/http"
@@ -56,7 +57,8 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 
 	if user != nil {
 		WriteErrResponse(writer, request, nil,
-			fmt.Sprintf("user with login %s allready exists", openRequest.Payload.Login), 400)
+			fmt.Sprintf("user with login %s already exists", openRequest.Payload.Login), 400)
+		return
 	}
 
 	userConfirm, err := ctx.DbContext.GetUserConfirmByLogin(openRequest.Payload.Login)
@@ -89,12 +91,11 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 	msg.SetHeader("To", userConfirm.Email)
 	msg.SetHeader("Subject", "Confirm registration")
 
-	link := fmt.Sprintf("%s/%s/%s", ctx.DbContext.Endpoint, "v1/auth/confirm", userConfirm.ConfirmaCode)
+	link := fmt.Sprintf("%s/%s/%s/%s", ctx.DbContext.Endpoint, "v1/auth/confirm", userConfirm.Id, userConfirm.ConfirmaCode)
 	text := `
 <h3>OpenCourse confirmation of registration.</h3>
 <p>This email is automatically sent by OpenCourse. Don't answer it.</p>
 `
-
 	msg.SetBody("text/html", fmt.Sprintf("%s <p>Please, follow the link to <a href='%s'>confirm</a></p>", text, link))
 
 	n := gomail.NewDialer("smtp.gmail.com", 587, ctx.DbContext.SmtpAccount, ctx.DbContext.SmtpAccountPass)
@@ -121,4 +122,63 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 		"The confirmation link has been sent to your email"
 	WriteResponse[string](writer, request, &message)
 
+}
+
+func (ctx *RouteContext) Confirm(writer http.ResponseWriter, request *http.Request) {
+	confirmId := chi.URLParam(request, "id")
+	code := chi.URLParam(request, "code")
+
+	userConfirm, err := ctx.DbContext.GetUserConfirm(confirmId)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		return
+	}
+
+	if userConfirm.ConfirmaCode != code {
+		WriteErrResponse(writer, request, errors.New("registration confirmation codes do not match"), "The link is not valid.", 400)
+		return
+	}
+
+	if userConfirm.Confirmed == true {
+		WriteErrResponse(writer, request, errors.New(fmt.Sprintf("user login = %s id = %s already confirmed", userConfirm.Login, userConfirm.Id)), "The link is not valid.", 400)
+		return
+	}
+
+	user, err := ctx.DbContext.GetUserByLogin(userConfirm.Login)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		return
+	}
+
+	if user != nil {
+		WriteErrResponse(writer, request, errors.New("user already exist"), "The link is not valid.", 400)
+		return
+	}
+
+	addUserQuery := common.AddUserQuery{
+		Login:    userConfirm.Login,
+		Password: userConfirm.Password,
+		Email:    userConfirm.Email,
+		Name:     userConfirm.Name,
+		Avatar:   userConfirm.Avatar,
+		Roles:    []string{common.RoleUser},
+	}
+
+	_, err = ctx.DbContext.AddUser(&addUserQuery)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		return
+	}
+
+	err = ctx.DbContext.SetConfirmed(confirmId)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		return
+	}
+
+	_, _ = writer.Write([]byte("<b>Registration SUCCESS completed!</b>"))
 }

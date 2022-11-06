@@ -160,7 +160,7 @@ func (ctx *DbContext) GetUserByLogin(login string) (*common.User, error) {
 	}
 
 	find := bson.D{{
-		"login", login,
+		"credential.login", login,
 	}}
 
 	var dbUser DbUser
