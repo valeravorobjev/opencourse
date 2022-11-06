@@ -88,7 +88,14 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 	msg.SetHeader("From", "confirm@opencourse.com")
 	msg.SetHeader("To", userConfirm.Email)
 	msg.SetHeader("Subject", "Confirm registration")
-	msg.SetBody("text/html", fmt.Sprintf("Please, follow the link provided %s/%s", fmt.Sprintf("%s/%s", ctx.DbContext.Endpoint, "v1/auth/confirm"), userConfirm.ConfirmaCode))
+
+	link := fmt.Sprintf("%s/%s/%s", ctx.DbContext.Endpoint, "v1/auth/confirm", userConfirm.ConfirmaCode)
+	text := `
+<h3>OpenCourse confirmation of registration.</h3>
+<p>This email is automatically sent by OpenCourse. Don't answer it.</p>
+`
+
+	msg.SetBody("text/html", fmt.Sprintf("%s <p>Please, follow the link to <a href='%s'>confirm</a></p>", text, link))
 
 	n := gomail.NewDialer("smtp.gmail.com", 587, ctx.DbContext.SmtpAccount, ctx.DbContext.SmtpAccountPass)
 
