@@ -216,12 +216,9 @@ func (ctx *DbContext) AddUserConfirm(query *common.RegisterQuery) (*common.UserC
 	dbUserConfirm.Confirmed = false
 
 	key := fmt.Sprintf("%s %s %s", dbUserConfirm.Login, dbUserConfirm.Email, dbUserConfirm.Password)
-	h := sha256.New()
-	h.Write([]byte(key))
+	code := sha256.Sum256([]byte(key))
 
-	code := string(h.Sum(nil))
-
-	dbUserConfirm.ConfirmaCode = code
+	dbUserConfirm.ConfirmaCode = fmt.Sprintf("%x", code[:])
 
 	result, err := col.InsertOne(context.Background(), dbUserConfirm)
 
