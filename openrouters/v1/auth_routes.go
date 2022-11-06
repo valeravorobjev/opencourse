@@ -8,6 +8,8 @@ import (
 	"gopkg.in/gomail.v2"
 	"net/http"
 	"opencourse/common"
+	"opencourse/database"
+	"strings"
 	"time"
 )
 
@@ -18,20 +20,31 @@ func (ctx *RouteContext) Login(writer http.ResponseWriter, request *http.Request
 
 	err := render.Bind(request, openRequest)
 	if err != nil {
-		WriteErrResponse(writer, request, err, "invalid model", 400)
+		WriteErrResponse(writer, request, err, "Invalid model.", 400)
 		return
 	}
 
-	// TODO: put here user logic
+	user, err := ctx.DbContext.GetUserByLogin(openRequest.Payload.Login)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err, "User or password is incorrect.", 400)
+		return
+	}
+
+	if user.Credential.Password != database.BuildHash(openRequest.Payload.Login, user.Credential.Salt) {
+		WriteErrResponse(writer, request, err, "User or password is incorrect.", 400)
+		return
+	}
 
 	_, tokenString, err := ctx.TokenAuth.Encode(
 		map[string]interface{}{
 			"login": openRequest.Payload.Login,
+			"roles": strings.Join(user.Credential.Roles, ","),
 			"exp":   time.Now().Add(time.Minute * 60).Unix(),
 		})
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "create token error", 400)
+		WriteErrResponse(writer, request, err, "Create token error.", 400)
 		return
 	}
 

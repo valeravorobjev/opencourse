@@ -14,6 +14,15 @@ import (
 	"time"
 )
 
+func BuildHash(password string, salt int) string {
+	sha := sha1.New()
+	str := fmt.Sprintf(password, salt)
+	sha.Write([]byte(str))
+	hash := hex.EncodeToString(sha.Sum(nil))
+
+	return hash
+}
+
 /*
 AddUser create user and save his to database. Parameters:
 createUserQuery - create user model;
@@ -104,10 +113,7 @@ func (ctx *DbContext) AddUser(createUserQuery *common.AddUserQuery) (string, err
 	maxRand := 99999999
 	salt := rand.Intn(maxRand-minRand) + minRand
 
-	sha := sha1.New()
-	str := fmt.Sprintf(createUserQuery.Password, salt)
-	sha.Write([]byte(str))
-	hash := hex.EncodeToString(sha.Sum(nil))
+	hash := BuildHash(createUserQuery.Password, salt)
 
 	timeNow := primitive.NewDateTimeFromTime(time.Now().UTC())
 
