@@ -124,6 +124,7 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 
 }
 
+// Confirm route
 func (ctx *RouteContext) Confirm(writer http.ResponseWriter, request *http.Request) {
 	confirmId := chi.URLParam(request, "id")
 	code := chi.URLParam(request, "code")
