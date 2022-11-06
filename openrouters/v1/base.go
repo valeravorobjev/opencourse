@@ -47,6 +47,8 @@ func WriteErrResponse(writer http.ResponseWriter, request *http.Request, err err
 		httplog.LogEntrySetField(request.Context(), "err", err.Error())
 	}
 
+	httplog.LogEntrySetField(request.Context(), "err.msg", msg)
+
 	response := OpenResponse[string]{Error: msg}
 
 	render.Status(request, httpStatus)
@@ -54,6 +56,6 @@ func WriteErrResponse(writer http.ResponseWriter, request *http.Request, err err
 
 	if err != nil {
 		writer.WriteHeader(500)
-		httplog.LogEntrySetField(request.Context(), "err", err.Error())
+		httplog.LogEntrySetField(request.Context(), "err.render", err.Error())
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"opencourse/common"
 	"opencourse/common/openerrors"
 	"time"
@@ -154,6 +155,10 @@ func (ctx *DbContext) GetUserConfirmByLogin(login string) (*common.UserConfirm, 
 
 	var dbUserConfirm DbUserConfirm
 	err := col.FindOne(context.Background(), find).Decode(&dbUserConfirm)
+
+	if err != nil && err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, openerrors.DbErr{
