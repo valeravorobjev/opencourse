@@ -327,3 +327,12 @@ func (ctx *DbContext) RemoveCourseTags(id string, tags []string) error {
 
 	return nil
 }
+
+/*
+DeleteCourse - remove course. Parameters:
+courseId - course id;
+TODO: add implementation add transaction
+*/
+func (ctx *DbContext) DeleteCourse(courseId string) (*common.Course, error) {
+	return nil, nil
+}

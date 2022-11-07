@@ -20,6 +20,11 @@ func RouteTable(dbContext database.DbContext, tokenAuth *jwtauth.JWTAuth) http.H
 		r.Get("/courses/{courseId}", rtx.GetCourses)
 		r.Post("/courses", rtx.PostCourse)
 
+		r.Get("/stages/{courseId}/list", rtx.GetStages)
+		r.Get("/stages/{stageId}", rtx.GetStage)
+		r.Post("/stages", rtx.PostStage)
+		r.Put("/stages", rtx.PutStage)
+
 		r.Get("/categories/{lang}", rtx.GetCategories)
 		r.Post("/categories", rtx.PostCategory)
 	})
