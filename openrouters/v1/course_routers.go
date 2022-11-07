@@ -40,3 +40,19 @@ func (ctx *RouteContext) GetCourses(writer http.ResponseWriter, request *http.Re
 
 	WriteResponse[[]*common.Course](writer, request, &courses)
 }
+
+func (ctx *RouteContext) GetCourse(writer http.ResponseWriter, request *http.Request) {
+
+	courseId := chi.URLParam(request, "courseId")
+
+	course, err := ctx.DbContext.GetCourse(courseId)
+
+	if err != nil {
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrInternal, Message: "Internal error. Can't get course."}, 400)
+		return
+	}
+
+	WriteResponse[common.Course](writer, request, course)
+
+}
