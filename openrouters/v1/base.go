@@ -2,11 +2,14 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/httplog"
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-chi/render"
+	"golang.org/x/exp/slices"
 	"net/http"
 	"opencourse/database"
+	"strings"
 )
 
 const (
@@ -16,6 +19,8 @@ const (
 	ErrLoginOrPassword   = 4 // ErrLoginOrPassword - login or password is incorrect
 	ErrUserAlreadyExists = 5 // ErrUserAlreadyExists - user with same login already exist
 	ErrValid             = 6 // ErrValid - validation error
+	ErrAuth              = 7 // ErrAuth authentication error
+	ErrForbidden         = 8 // ErrForbidden access forbidden
 )
 
 // ResponseError model with error description
@@ -91,4 +96,34 @@ func WriteErrResponse(writer http.ResponseWriter, request *http.Request, interna
 		writer.WriteHeader(500)
 		httplog.LogEntrySetField(request.Context(), "err.render", err.Error())
 	}
+}
+
+func InRole(writer http.ResponseWriter, request *http.Request, role string) bool {
+	_, claims, err := jwtauth.FromContext(request.Context())
+
+	if err != nil {
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrAuth, Message: "Invalid token"}, 401)
+		return false
+	}
+
+	roleStr, ok := claims["roles"]
+
+	if !ok {
+		WriteErrResponse(writer, request, errors.New("token hasn't claim roles"),
+			&ResponseError{Code: ErrAuth, Message: "Invalid token"}, 401)
+		return false
+	}
+
+	roles := strings.Split(roleStr.(string), ",")
+
+	if !slices.Contains[string](roles, role) {
+		err = errors.New("user is not in role, access forbidden")
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrAuth, Message: "Forbidden"}, 403)
+
+		return false
+	}
+
+	return true
 }

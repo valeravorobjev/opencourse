@@ -15,17 +15,10 @@ const (
 	LangRu = "ru" // Russian
 )
 
-// Action types
-const (
-	ActionLike    = "Like"    // Like
-	ActionDislike = "Dislike" // Dislike
-)
-
 // User roles
 const (
-	RoleUser   = "User"          // Simple user role
-	RoleAuthor = "Author"        // Is an author of courses
-	RoleAdmin  = "Administrator" // Privileged user role
+	RoleUser  = "user"  // Simple user role
+	RoleAdmin = "admin" // Privileged user role
 )
 
 // Test types

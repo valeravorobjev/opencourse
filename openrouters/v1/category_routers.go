@@ -24,6 +24,12 @@ func (ctx *RouteContext) GetCategories(writer http.ResponseWriter, request *http
 
 func (ctx *RouteContext) PostCategory(writer http.ResponseWriter, request *http.Request) {
 
+	// Check user role. If user is not in role, return.
+	ok := InRole(writer, request, common.RoleAdmin)
+	if !ok {
+		return
+	}
+
 	openRequest := &Request[common.AddCategoryQuery]{}
 
 	err := render.Bind(request, openRequest)
@@ -46,6 +52,12 @@ func (ctx *RouteContext) PostCategory(writer http.ResponseWriter, request *http.
 }
 
 func (ctx *RouteContext) PutCategory(writer http.ResponseWriter, request *http.Request) {
+	// Check user role. If user is not in role, return.
+	ok := InRole(writer, request, common.RoleAdmin)
+	if !ok {
+		return
+	}
+
 	openRequest := &Request[common.UpdateCategoryQuery]{}
 
 	err := render.Bind(request, openRequest)
