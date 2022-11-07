@@ -13,26 +13,28 @@ import (
 	"time"
 )
 
-// Login TODO: this route is not complete!
+// Login route
 func (ctx *RouteContext) Login(writer http.ResponseWriter, request *http.Request) {
 
-	openRequest := &OpenRequest[common.LoginQuery]{}
+	openRequest := &Request[common.LoginQuery]{}
 
 	err := render.Bind(request, openRequest)
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Invalid model.", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrBinding, Message: "Invalid model."}, 400)
 		return
 	}
 
 	user, err := ctx.DbContext.GetUserByLogin(openRequest.Payload.Login)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "User or password is incorrect.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrLoginOrPassword, Message: "Login or password is incorrect."}, 400)
 		return
 	}
 
 	if user.Credential.Password != database.BuildHash(openRequest.Payload.Login, user.Credential.Salt) {
-		WriteErrResponse(writer, request, err, "User or password is incorrect.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrLoginOrPassword, Message: "Login or password is incorrect."}, 400)
 		return
 	}
 
@@ -44,7 +46,7 @@ func (ctx *RouteContext) Login(writer http.ResponseWriter, request *http.Request
 		})
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Create token error.", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "Create token error."}, 400)
 		return
 	}
 
@@ -53,49 +55,51 @@ func (ctx *RouteContext) Login(writer http.ResponseWriter, request *http.Request
 
 // Register route
 func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Request) {
-	openRequest := &OpenRequest[common.RegisterQuery]{}
+	openRequest := &Request[common.RegisterQuery]{}
 
 	err := render.Bind(request, openRequest)
 	if err != nil {
-		WriteErrResponse(writer, request, err, "invalid model", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrBinding, Message: "Invalid model."}, 400)
 		return
 	}
 
 	user, err := ctx.DbContext.GetUserByLogin(openRequest.Payload.Login)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "registration error", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "Registration error"}, 400)
 		return
 	}
 
 	if user != nil {
 		WriteErrResponse(writer, request, nil,
-			fmt.Sprintf("user with login %s already exists", openRequest.Payload.Login), 400)
+			&ResponseError{Code: ErrUserAlreadyExists,
+				Message: fmt.Sprintf("User with login %s already exists", openRequest.Payload.Login)}, 400)
 		return
 	}
 
 	userConfirm, err := ctx.DbContext.GetUserConfirmByLogin(openRequest.Payload.Login)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "registration error", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "Registration error"}, 400)
 		return
 	}
 
 	// if user don't exist in collection users but user_confirms user has confirmed
 	if userConfirm != nil && userConfirm.Confirmed == true {
-		WriteErrResponse(writer, request, err, "user is incorrect, registration error, please contact to support", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "User is incorrect, registration error, please contact to support"}, 400)
 		return
 	}
 
 	if userConfirm != nil {
-		WriteErrResponse(writer, request, err, "user with this login already exists", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrUserAlreadyExists,
+			Message: fmt.Sprintf("User with login %s already exists", openRequest.Payload.Login)}, 400)
 		return
 	}
 
 	userConfirm, err = ctx.DbContext.AddUserConfirm(&openRequest.Payload)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "registration error", 400)
+		WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "Registration error"}, 400)
 		return
 	}
 
@@ -126,7 +130,7 @@ func (ctx *RouteContext) Register(writer http.ResponseWriter, request *http.Requ
 				err = errors.New(fmt.Sprintf("%s | %s", tempErr, err))
 			}
 
-			WriteErrResponse(writer, request, err, "registration error", 400)
+			WriteErrResponse(writer, request, err, &ResponseError{Code: ErrInternal, Message: "Registration error"}, 400)
 			return
 		}
 	}
@@ -145,29 +149,35 @@ func (ctx *RouteContext) Confirm(writer http.ResponseWriter, request *http.Reque
 	userConfirm, err := ctx.DbContext.GetUserConfirm(confirmId)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrInternal, Message: "Confirmation error. Try follow the link again or registration."}, 400)
 		return
 	}
 
 	if userConfirm.ConfirmaCode != code {
-		WriteErrResponse(writer, request, errors.New("registration confirmation codes do not match"), "The link is not valid.", 400)
+		WriteErrResponse(writer, request, errors.New("registration confirmation codes do not match"),
+			&ResponseError{Code: ErrValid, Message: "The link is not valid."}, 400)
 		return
 	}
 
 	if userConfirm.Confirmed == true {
-		WriteErrResponse(writer, request, errors.New(fmt.Sprintf("user login = %s id = %s already confirmed", userConfirm.Login, userConfirm.Id)), "The link is not valid.", 400)
+		WriteErrResponse(writer, request,
+			errors.New(fmt.Sprintf("user login = %s id = %s already confirmed", userConfirm.Login, userConfirm.Id)),
+			&ResponseError{Code: ErrValid, Message: "The link is not valid."}, 400)
 		return
 	}
 
 	user, err := ctx.DbContext.GetUserByLogin(userConfirm.Login)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrInternal, Message: "Confirmation error. Try follow the link again or registration."}, 400)
 		return
 	}
 
 	if user != nil {
-		WriteErrResponse(writer, request, errors.New("user already exist"), "The link is not valid.", 400)
+		WriteErrResponse(writer, request, errors.New("user already exist"),
+			&ResponseError{Code: ErrValid, Message: "The link is not valid."}, 400)
 		return
 	}
 
@@ -183,14 +193,16 @@ func (ctx *RouteContext) Confirm(writer http.ResponseWriter, request *http.Reque
 	_, err = ctx.DbContext.AddUser(&addUserQuery)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrInternal, Message: "Confirmation error. Try follow the link again or registration."}, 400)
 		return
 	}
 
 	err = ctx.DbContext.SetConfirmed(confirmId)
 
 	if err != nil {
-		WriteErrResponse(writer, request, err, "Confirmation error. Try follow the link again or registration.", 400)
+		WriteErrResponse(writer, request, err,
+			&ResponseError{Code: ErrInternal, Message: "Confirmation error. Try follow the link again or registration."}, 400)
 		return
 	}
 

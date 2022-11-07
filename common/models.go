@@ -100,9 +100,9 @@ type AddCategoryQuery struct {
 
 // UpdateCategoryQuery model for update category
 type UpdateCategoryQuery struct {
-	CategoryId string   `json:"category_id"`
-	Langs      []string `json:"lang"` // Support language
-	Name       string   `json:"name"`
+	CategoryId string `json:"category_id"` // Category id
+	Lang       string `json:"lang"`        // Support language
+	Name       string `json:"name"`        // Category name
 }
 
 // Course model
