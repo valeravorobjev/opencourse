@@ -18,6 +18,7 @@ func RouteTable(dbContext database.DbContext, tokenAuth *jwtauth.JWTAuth) http.H
 
 		r.Get("/courses/{categoryId}/list", rtx.GetCourses)
 		r.Get("/courses/{courseId}", rtx.GetCourses)
+		r.Post("/courses", rtx.PostCourse)
 
 		r.Get("/categories/{lang}", rtx.GetCategories)
 		r.Post("/categories", rtx.PostCategory)
